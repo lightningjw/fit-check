@@ -299,7 +299,7 @@ async function ask(label,prompt,{images,tier='default'}={}){
 }
 const palLine=s=>{const p=SEASONS[s];return p?GROUPS.map(g=>`${g}: ${p[g].map(c=>c.name).join(', ')}`).join('; '):''};
 function profileBrief(){const p=S.profile||{};const b=BUDGETS.filter(k=>p.budgets&&p.budgets[k]).map(k=>`${k} up to $${p.budgets[k]}`).join(', ');
-  return [`Color season: ${p.season||'not set'}`,p.season?`Palette — ${palLine(p.season)}`:'',p.metals?`Metals: ${p.metals}`:'',p.style?`Style direction: ${p.style}`:'',
+  return [`Color season: ${p.season||'not set'}`,p.season?`Palette — ${palLine(p.season)}`:'',p.metals?`Metals: ${p.metals}`:'',p.department?`Shops in: ${p.department} department`:'',p.style?`Style direction: ${p.style}`:'',
     (p.height||p.build)?`Height/build: ${[p.height,p.build].filter(Boolean).join(', ')}`:'',p.measurements?`Measurements: ${p.measurements}`:'',p.fit_problems?`Fit problems: ${p.fit_problems}`:'',
     b?`Budget per category: ${b}`:'',p.hard_nos?`Hard no's (never suggest): ${p.hard_nos}`:''].filter(Boolean).join('\n')}
 const rowOf=i=>[i.item_id,i.name,[i.category,i.subcategory].filter(Boolean).join('/'),[i.primary_color,i.secondary_color].filter(Boolean).join('+'),i.palette_fit||'unrated',i.material||'?',`formality ${i.formality||'?'}`,i.season||'all'].join(' | ');
@@ -344,7 +344,11 @@ Closet:
 ${closetRows()}
 ${t?`\nTaste profile: ${t.summary}\nRecurring patterns: ${(t.patterns||[]).map(p=>`${p.pattern} (${p.count})`).join(', ')}\n`:''}
 A gap is one durable piece the user does not own that would combine with pieces they do own. Rank by how many new outfits it unlocks. Be conservative with the count, and list the owned item_ids it pairs with. Describe the piece generically: no brand names, no product names. price_low and price_high are a target range in whole US dollars that respects the user's budget for that category; they are a budget guide, not a quote.
-Schema: {"gaps": [{"gap": short name of what is missing, "piece": {"item": string such as "chore jacket", "color": string, "cut": string, "fabric": string, "price_low": integer, "price_high": integer}, "unlocks": integer, "pairs_with": [item_id, ... up to 6], "why": one sentence on why it suits the user's palette and build}]} with exactly 5 gaps, best first.`}
+Also write two shopping search queries per gap, phrased the way a shopper types into a store search box, not the way a stylist describes a garment:
+- search_query: 4 to 6 words. ${S.profile&&S.profile.department?`Start with "${S.profile.department}".`:'No department word.'} Then one everyday retail color word (say "olive", not "dusty olive"; "burgundy", not "oxblood"), then the item noun, then at most two of: the cut, the fabric, or one fit term retailers actually use that addresses the user's build or fit problems (such as "tall", "athletic fit", "wide", "petite", "relaxed").
+- search_broad: 2 to 4 words: ${S.profile&&S.profile.department?'the department, ':''}the color family and the item noun only.
+No brand names, prices, sizes or punctuation in either query.
+Schema: {"gaps": [{"gap": short name of what is missing, "search_query": string, "search_broad": string, "piece": {"item": string such as "chore jacket", "color": string, "cut": string, "fabric": string, "price_low": integer, "price_high": integer}, "unlocks": integer, "pairs_with": [item_id, ... up to 6], "why": one sentence on why it suits the user's palette and build}]} with exactly 5 gaps, best first.`}
 
 /* ---------- small UI helpers ---------- */
 let toastT;function toast(m){$('#toast-p').textContent=m;$('#toast').classList.add('open');clearTimeout(toastT);toastT=setTimeout(()=>$('#toast').classList.remove('open'),4200)}
@@ -528,7 +532,10 @@ async function outfitBuild(fresh){const f=S.oform;if(!f.occasion.trim()){toast('
   S.suggestion={items:out.items.map(String),reason:String(out.reason).slice(0,300),swap:out.swap?{out:String(out.swap.out),in:String(out.swap.in),why:String(out.swap.why||'').slice(0,120)}:null,gap:out.gap?String(out.gap).slice(0,200):null,occasion:f.occasion.trim(),temp,anchor:f.anchor||''};render()}
 
 /* ---------- Shop ---------- */
-const shopURL=p=>'https://www.google.com/search?tbm=shop&q='+encodeURIComponent([p.color,p.cut,p.item,p.fabric].filter(Boolean).join(' '));
+/* Query: Claude's shopper-style phrase, else department + color + item. Price: a soft ceiling 25% over the target, no floor, so results stay plentiful. */
+function shopURL(x,broad){const dep=(S.profile&&S.profile.department)||'',fallback=[dep,x.piece.color,x.piece.item].filter(Boolean).join(' ');
+  const query=(broad?x.broad:x.search)||fallback,cap=!broad&&x.piece.price_high?Math.ceil(x.piece.price_high*1.25):0;
+  return'https://www.google.com/search?tbm=shop&q='+encodeURIComponent(query)+(cap?'&tbs='+encodeURIComponent(`mr:1,price:1,ppr_max:${cap}`):'')}
 function shopView(){const g=S.insights.gaps;
   let h=`<div class="head"><h1>Shop</h1><p class="sub">${g?`Top ${g.list.length} gaps · checked ${day(g.at)} against ${g.n} pieces`:'Buy only what fills a gap'}</p></div>`;
   if(S.items.length<5)return h+`<section class="empty"><h2>Gaps need a closet to measure</h2><p>Add at least 5 pieces so the analysis can count the outfits a new piece would unlock. You have ${S.items.length}.</p><button class="btn small" data-act="go" data-v="closet">Open closet</button></section>`;
@@ -539,15 +546,15 @@ function shopView(){const g=S.insights.gaps;
     ${x.pairs_with.length?`<div class="chips">${x.pairs_with.map(id=>`<span class="chip">${esc(nameOf(id))}</span>`).join('')}</div>`:''}
     <p class="hint">${esc(x.why)}</p>
     ${x.piece.price_high?`<p class="kv"><b>Target range:</b> $${x.piece.price_low}–$${x.piece.price_high} <span class="hint">(a budget guide, not a live price)</span></p>`:''}
-    <div class="row"><a class="btn ghost small" href="${esc(shopURL(x.piece))}" target="_blank" rel="noopener noreferrer">Search Google Shopping</a></div></section>`).join('');
-  return h+`<p class="hint">Links open a Google Shopping search built from the description. Nothing here is a specific product, price or stock check.</p>`}
+    <div class="row"><a class="btn small" href="${esc(shopURL(x))}" target="_blank" rel="noopener noreferrer">Search Google Shopping</a><a class="btn ghost small" href="${esc(shopURL(x,true))}" target="_blank" rel="noopener noreferrer">Broader search</a></div>${x.search?`<p class="hint">Searches for "${esc(x.search)}"${x.piece.price_high?`, up to $${Math.ceil(x.piece.price_high*1.25)}`:''}.</p>`:''}</section>`).join('');
+  return h+`<p class="hint">Links open a Google Shopping search built from the description and your profile. Too few results? Use Broader search. Nothing here is a specific product, price or stock check.</p>`}
 async function gapsFind(){let r;try{r=await ask('Finding your gaps',gapsPrompt())}catch(e){if(!e.handled)toast("The gap analysis didn't come back cleanly. Try again.");return}
-  const int=v=>Math.max(0,Math.round(Number(v))||0),list=(r&&Array.isArray(r.gaps)?r.gaps:[]).map(x=>{const p=x&&x.piece||{};return{gap:String(x&&x.gap||'').slice(0,80),piece:{item:String(p.item||'').slice(0,60),color:String(p.color||'').slice(0,40),cut:String(p.cut||'').slice(0,60),fabric:String(p.fabric||'').slice(0,60),price_low:int(p.price_low),price_high:int(p.price_high)},unlocks:int(x&&x.unlocks),pairs_with:(Array.isArray(x&&x.pairs_with)?x.pairs_with:[]).map(String).filter(itemBy).slice(0,6),why:String(x&&x.why||'').slice(0,300)}}).filter(x=>x.gap&&x.piece.item).slice(0,5);
+  const int=v=>Math.max(0,Math.round(Number(v))||0),q=v=>String(v||'').replace(/[^\p{L}\p{N}' -]/gu,' ').replace(/\s+/g,' ').trim().slice(0,80),list=(r&&Array.isArray(r.gaps)?r.gaps:[]).map(x=>{const p=x&&x.piece||{};return{gap:String(x&&x.gap||'').slice(0,80),piece:{item:String(p.item||'').slice(0,60),color:String(p.color||'').slice(0,40),cut:String(p.cut||'').slice(0,60),fabric:String(p.fabric||'').slice(0,60),price_low:int(p.price_low),price_high:int(p.price_high)},unlocks:int(x&&x.unlocks),search:q(x&&x.search_query),broad:q(x&&x.search_broad),pairs_with:(Array.isArray(x&&x.pairs_with)?x.pairs_with:[]).map(String).filter(itemBy).slice(0,6),why:String(x&&x.why||'').slice(0,300)}}).filter(x=>x.gap&&x.piece.item).slice(0,5);
   if(!list.length){toast("Claude didn't return usable gaps. Try again.");return}
   S.insights={...S.insights,gaps:{list,n:S.items.length,at:Date.now()}};render();try{await save(P.insights(),S.insights)}catch(e){}}
 
 /* ---------- Profile ---------- */
-const blankProfile=()=>({season:'',metals:'',style:'',height:'',build:'',measurements:'',sizes:'',fit_problems:'',budgets:{},hard_nos:''});
+const blankProfile=()=>({season:'',metals:'',department:'',style:'',height:'',build:'',measurements:'',sizes:'',fit_problems:'',budgets:{},hard_nos:''});
 function profileView(){if(!S.pdraft)S.pdraft={...blankProfile(),...(S.profile||{}),budgets:{...((S.profile||{}).budgets||{})}};const d=S.pdraft,e=S.selfie;
   return`<div class="head"><h1>Profile</h1><p class="sub">${S.profile?'Private to you. Edit any time.':'Start here. Everything else is judged against this.'}</p></div>
   <form class="stack" data-form="profile" data-submit="profile-save" novalidate>
@@ -556,7 +563,7 @@ function profileView(){if(!S.pdraft)S.pdraft={...blankProfile(),...(S.profile||{
       ${aiOK()&&S.ai.images?`<div class="row">${FILE('Estimate from a daylight selfie','selfie','accept="image/*"','ghost small')}</div><p class="hint">Estimate, not a substitute for a draped analysis. The selfie goes to Claude once and is not saved.</p>`:''}
       ${e?`<div class="card"><h3>Estimate, not a substitute for a draped analysis</h3><p><b>${esc(e.season)}</b> · ${esc(e.confidence)} confidence${e.runner_up&&e.runner_up!==e.season?` · runner-up ${esc(e.runner_up)}`:''}</p><p class="hint">${esc(e.why)}</p><div class="row"><button type="button" class="btn small" data-act="selfie-use">Use ${esc(e.season)}</button></div></div>`:''}
       ${SEL('Metals','metals',d.metals,[['','Choose'],...METALS])}</section>
-    <section class="card"><h3>Style and fit</h3>${F('Style direction, 3 to 5 words','style',d.style,'maxlength="80" placeholder="relaxed tailored earthy workwear"')}
+    <section class="card"><h3>Style and fit</h3>${SEL('Shop in','department',d.department,[['','No preference'],["men's",'Menswear'],["women's",'Womenswear']])}${F('Style direction, 3 to 5 words','style',d.style,'maxlength="80" placeholder="relaxed tailored earthy workwear"')}
       <div class="grid2">${F('Height','height',d.height,'maxlength="20" placeholder="5 ft 10"')}${F('Build','build',d.build,'maxlength="40" placeholder="athletic, broad shoulders"')}</div>
       ${TA('Measurements','measurements',d.measurements,'chest 40, waist 32, inseam 30, shoulder 18.5')}${TA('Sizes by brand','sizes',d.sizes,'Uniqlo M · Levi\'s 32x30 · Nike 10.5')}${TA('Fit problems','fit_problems',d.fit_problems,'sleeves run long, thighs tight in slim cuts')}${TA("Hard no's",'hard_nos',d.hard_nos,'skinny jeans, logos, silver hardware')}</section>
     <section class="card"><h3>Budget per piece, in dollars</h3><div class="grid2">${BUDGETS.map(b=>F(b[0].toUpperCase()+b.slice(1),'budget_'+b,d.budgets[b]??'','type="number" inputmode="numeric" min="0" max="100000" placeholder="0"')).join('')}</div></section>
@@ -564,7 +571,7 @@ function profileView(){if(!S.pdraft)S.pdraft={...blankProfile(),...(S.profile||{
   </form>
   <section class="card"><h3>Your data</h3><p class="hint">Signed in as ${esc(S.email)}. Only you can read your closet through the app; whoever runs this site administers the database.</p>
     <div class="row"><button class="btn ghost small" data-act="data-export">Export my data</button><button class="btn danger small" data-act="data-delete">Delete my data</button><button class="btn ghost small" data-act="sign-out">Sign out</button></div></section>`}
-function syncProfile(f){const d=formData(f),p=S.pdraft||(S.pdraft=blankProfile());['season','metals','style','height','build','measurements','sizes','fit_problems','hard_nos'].forEach(k=>{p[k]=String(d[k]??'')});
+function syncProfile(f){const d=formData(f),p=S.pdraft||(S.pdraft=blankProfile());['season','metals','department','style','height','build','measurements','sizes','fit_problems','hard_nos'].forEach(k=>{p[k]=String(d[k]??'')});
   p.budgets={};BUDGETS.forEach(b=>{const v=Math.round(Number(d['budget_'+b]));if(v>0)p.budgets[b]=v})}
 async function profileSave(){const f=$('form[data-form=profile]');if(f)syncProfile(f);const d=S.pdraft;
   if(!d.season){toast('Choose a color season first.');return}
