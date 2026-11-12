@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fit Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: one 720px column under a ribbon of the wearer's palette; fixed five-tab bar below. */
+  --paper:#EEEEEA; --card:#FAFAF7; --ink:#17171A; --mute:#636368; --line:#D6D5CF; --wash:#E3E2DC;
+  --accent:#17171A; --ok:#2F6B4F; --warn:#8A5D0C; --bad:#A1362B;
+  --display:"Bodoni Moda","Didot","Bodoni MT",Georgia,serif;
+  --body:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--paper:#111113;--card:#1A1A1D;--ink:#ECEBE6;--mute:#9D9DA2;--line:#2E2E32;--wash:#232326;--ok:#7CC0A0;--warn:#D9AE5A;--bad:#E69084;color-scheme:dark}
+}
+:root[data-theme="dark"]{--paper:#111113;--card:#1A1A1D;--ink:#ECEBE6;--mute:#9D9DA2;--line:#2E2E32;--wash:#232326;--ok:#7CC0A0;--warn:#D9AE5A;--bad:#E69084;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:400 16px/1.5 var(--body);padding-bottom:96px;-webkit-text-size-adjust:100%}
+img{max-width:100%}
+h1,h2,h3{text-wrap:balance;margin:0}
+h1{font:italic 500 44px/1 var(--display);letter-spacing:-.01em}
+h2{font:500 24px/1.15 var(--display)}
+h3{font:600 12px/1.3 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+p{margin:0}
+a{color:inherit}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* header */
+.top{position:sticky;top:0;z-index:20;background:var(--paper)}
+#ribbon{display:flex;height:7px;background:var(--wash)}
+#ribbon i{flex:1}
+.bar{display:flex;align-items:center;gap:12px;max-width:720px;margin:0 auto;padding:10px 16px;border-bottom:1px solid var(--line)}
+.mark{font:italic 600 22px/1 var(--display)}
+#season-tag{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+main{max-width:720px;margin:0 auto;padding:0 16px}
+#notice{font-size:13px;color:var(--mute);padding:10px 0 0}
+#notice:empty{display:none}
+#view{display:flex;flex-direction:column;gap:22px;padding:22px 0}
+.head{display:flex;flex-direction:column;gap:8px}
+.head h1::after{content:"";display:block;width:44px;height:3px;background:var(--accent);margin-top:14px}
+.sub{color:var(--mute);font-size:14px;font-variant-numeric:tabular-nums}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.stack{display:flex;flex-direction:column;gap:12px}
+
+/* controls */
+.btn{appearance:none;border:1px solid var(--ink);background:var(--ink);color:var(--paper);font:600 14px/1 var(--body);padding:12px 16px;border-radius:2px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none;min-height:42px}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.small{padding:8px 11px;min-height:34px;font-size:13px}
+.btn.danger{background:transparent;color:var(--bad);border-color:var(--bad)}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+label.btn:focus-within{outline:2px solid var(--ink);outline-offset:2px}
+.f{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--mute);flex:1 1 150px;min-width:0}
+.f input,.f select,.f textarea,.plain{font:400 16px/1.35 var(--body);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:2px;padding:10px 11px;width:100%}
+.f textarea{resize:vertical;min-height:64px}
+.grid2{display:flex;flex-wrap:wrap;gap:12px}
+.hint{font-size:13px;color:var(--mute)}
+.hint:empty{display:none}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.empty{border:1px dashed var(--line);border-radius:3px;padding:26px 18px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.empty h2{font-style:italic}
+.empty p{color:var(--mute);max-width:52ch}
+.walk ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.walk li{display:flex;gap:10px;align-items:baseline;font-size:15px}
+.walk .n{font:italic 500 18px/1 var(--display);width:22px;flex:none;color:var(--mute)}
+.walk li.done{color:var(--mute);text-decoration:line-through}
+.walk li.now .n{color:var(--ink)}
+.walk li.now{font-weight:600}
+
+/* palette */
+.pal{display:flex;flex-direction:column;gap:10px}
+.pal .g{display:flex;align-items:center;gap:10px}
+.pal .g span{width:62px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);flex:none}
+.sw{display:flex;flex-wrap:wrap;gap:5px}
+.sw i{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);display:block}
+.pal .avoid i{position:relative;opacity:.85}
+.pal .avoid i::after{content:"";position:absolute;left:-2px;right:-2px;top:50%;height:2px;background:var(--card);transform:rotate(-45deg)}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:99px;padding:3px 8px 3px 6px;white-space:nowrap}
+.pill i{width:9px;height:9px;border-radius:50%;background:var(--mute)}
+.pill.off{border-style:dashed;color:var(--bad);border-color:var(--bad)}
+.pill.off i{background:transparent;border:1.5px solid var(--bad)}
+.pill.good{color:var(--ok);border-color:var(--ok)}.pill.good i{background:var(--ok)}
+.pill.adapt{color:var(--warn);border-color:var(--warn)}.pill.adapt i{background:var(--warn)}
+
+/* closet grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.item{appearance:none;text-align:left;font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:3px;padding:0;cursor:pointer;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.item .im{aspect-ratio:4/5;background:var(--wash);display:block;width:100%;object-fit:cover}
+.item .tx{padding:9px 10px 11px;display:flex;flex-direction:column;gap:5px;min-width:0}
+.item b{font-weight:600;font-size:14px;line-height:1.25;overflow-wrap:anywhere}
+.item small{color:var(--mute);font-size:12px;overflow-wrap:anywhere}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:12px;border:1px solid var(--line);border-radius:2px;padding:2px 7px;color:var(--mute)}
+
+/* flat-lay */
+.lay{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:50px;grid-auto-flow:dense;gap:9px;padding:16px;background:var(--wash);border-radius:3px}
+.t{position:relative;overflow:hidden;border-radius:2px;background:var(--card);box-shadow:0 10px 18px -12px rgba(0,0,0,.5);grid-column:span 2;grid-row:span 2}
+.t:nth-child(odd){transform:rotate(-1.1deg)}.t:nth-child(even){transform:rotate(.8deg)}
+.t img,.t .blk{width:100%;height:100%;object-fit:cover;display:block}
+.t span{position:absolute;left:0;right:0;bottom:0;font-size:11px;line-height:1.25;padding:4px 6px;background:var(--card);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t.outerwear,.t.bottom{grid-column:span 3;grid-row:span 4}
+.t.top,.t.one-piece{grid-column:span 3;grid-row:span 3}
+.t.shoes{grid-column:span 3;grid-row:span 2}
+.outfit .why{font:italic 400 19px/1.35 var(--display)}
+.kv{font-size:14px}.kv b{font-weight:600}
+
+/* taste */
+.pat{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 0;border-top:1px solid var(--line);align-items:center}
+.pat .cnt{font:italic 500 20px/1 var(--display);font-variant-numeric:tabular-nums}
+.pat .meter{grid-column:1/-1;height:3px;background:var(--wash)}
+.pat .meter i{display:block;height:100%;background:var(--accent)}
+.pat p{grid-column:1/-1;font-size:13px;color:var(--mute)}
+
+/* tabs */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line)}
+nav.tabs div{max-width:720px;margin:0 auto;display:flex}
+nav.tabs button{flex:1;appearance:none;background:none;border:0;border-top:3px solid transparent;color:var(--mute);font:500 11px/1 var(--body);letter-spacing:.06em;padding:9px 2px 11px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;min-width:0}
+nav.tabs button[aria-current="page"]{color:var(--ink);border-top-color:var(--accent)}
+nav.tabs svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* sheet, busy, toast */
+#scrim{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center}
+#scrim.open{display:flex}
+#sheet{background:var(--paper);width:100%;max-width:560px;max-height:92%;overflow:auto;border-radius:10px 10px 0 0;padding:20px 16px 24px;display:flex;flex-direction:column;gap:14px}
+#sheet form{display:flex;flex-direction:column;gap:14px}
+#sheet .ph{width:140px;aspect-ratio:4/5;object-fit:cover;border-radius:2px;border:1px solid var(--line)}
+@media(min-width:600px){#scrim{align-items:center}#sheet{border-radius:6px}}
+#busy{position:fixed;left:0;right:0;bottom:74px;z-index:35;display:none;justify-content:center;padding:0 16px;pointer-events:none}
+#busy.open{display:flex}
+#busy div{pointer-events:auto;background:var(--ink);color:var(--paper);border-radius:3px;padding:10px 12px;display:flex;gap:12px;align-items:center;font-size:14px;max-width:560px;width:100%}
+#busy b{font-weight:600}#busy span{opacity:.75;flex:1;min-width:0}
+#busy button{appearance:none;background:none;border:1px solid currentColor;color:inherit;font:600 12px var(--body);padding:6px 10px;border-radius:2px;cursor:pointer}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--paper);animation:pulse 1.1s ease-in-out infinite;flex:none}
+@keyframes pulse{50%{opacity:.25}}
+#toast{position:fixed;left:16px;right:16px;top:64px;z-index:50;display:none;justify-content:center;pointer-events:none}
+#toast.open{display:flex}
+#toast p{background:var(--card);border:1px solid var(--ink);padding:10px 14px;border-radius:3px;font-size:14px;max-width:520px;box-shadow:0 12px 24px -14px rgba(0,0,0,.5)}
+.stars{display:flex;gap:6px}
+.fbrow{border-top:1px solid var(--line);padding:12px 0;display:flex;flex-direction:column;gap:4px}
+.fbrow .meta{font-size:12px;color:var(--mute);display:flex;gap:10px;flex-wrap:wrap}
+.fbrow p{white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:420px){h1{font-size:38px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.dot{animation:none}.t{transform:none!important}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+</head>
+<body>
+<header class="top">
+  <div id="ribbon" aria-hidden="true"></div>
+  <div class="bar">
+    <span class="mark">Fit Check</span>
+    <span id="season-tag"></span>
+    <button class="btn ghost small" data-act="feedback-open" id="fb-open">Send feedback</button>
+  </div>
+</header>
+<main>
+  <p id="notice" role="status"></p>
+  <div id="view"><section class="empty"><h2>Fit Check</h2><p>Opening your closet…</p></section></div>
+</main>
+<nav class="tabs" aria-label="Sections"><div id="tabs"></div></nav>
+<div id="busy" role="status"><div><i class="dot"></i><b id="busy-l"></b><span id="busy-d"></span><button data-act="ai-stop" id="busy-stop">Stop</button></div></div>
+<div id="scrim"><div id="sheet" role="dialog" aria-modal="true"></div></div>
+<div id="toast" role="status" aria-live="polite"><p id="toast-p"></p></div>
+
+<script>
+(()=>{'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const rid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const day=t=>new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+const withTimeout=(p,ms)=>{let t;return Promise.race([p,new Promise((_,rej)=>{t=setTimeout(()=>rej({code:'timeout'}),ms)})]).finally(()=>clearTimeout(t))};
+
+/* ---------- reference data ---------- */
+const SRC={
+'Light Spring':'Peach#F9C7A4,Buttercup#F8E08E,Mint#A8DDB5,Aqua#7FD3CC,Coral pink#F59A8C|Warm coral#FF7F66,Turquoise#36BDB0,Sunflower#F2B632,Periwinkle#8FA4E8|Ivory#F6EEDC,Camel#C9A777,Dove taupe#AFA393,Light navy#4F6D8F|Black#111111,Burgundy#5A1230,Charcoal#33363B,Dusty mauve#8E6F7E',
+'True Spring':'Golden yellow#F5B82E,Coral#FF6F50,Leaf green#5DAA47,Turquoise#1FB5AD,Apricot#F9A45C|Poppy#E8432E,Kelly green#2E9E4F,Bright aqua#19B7CE,Warm violet#8558B5|Cream#F5E9CF,Golden tan#C99A5B,Warm brown#7A5230,Clear navy#2C4A7C|Black#111111,Cool pink#D98BB0,Icy grey#C7CCD4,Plum#5B2A52',
+'Bright Spring':'Hot coral#FF5A4D,Lime#A4D233,Bright turquoise#00B4C5,Daffodil#FFD23F,Warm pink#F2578C|Poppy red#E62E2D,Emerald#0F9E62,Cobalt#1F5FD0,Violet#7A3FC2|Soft white#F7F2E8,Warm grey#9A938A,Chocolate#4E3524,Bright navy#1F2F6B|Dusty rose#B58A8E,Sage#94A187,Mushroom#A3948A,Muted mauve#8C7386',
+'Light Summer':'Powder blue#A9C9E8,Rose pink#EBA8BD,Lavender#BDB0E0,Seafoam#A5D8CB,Soft lemon#F3EBA6|Raspberry sorbet#D9577E,Periwinkle#7F92D9,Jade#4FAF9B,Watermelon#F06B7E|Soft white#F3F1EC,Light grey#C4C8CE,Rose beige#C9B2A6,Grey navy#4C5D7A|Black#111111,Orange#E8731A,Mustard#C9982B,Rust#9A4521',
+'True Summer':'Slate blue#5F7FA6,Rose#C7607F,Soft fuchsia#B8528F,Sea green#4C9B8F,Lavender blue#8D93C9|Raspberry#B32E5E,Teal#1F7F86,Plum#7A3F78,Cornflower#5F86D6|Soft white#EEF0F1,Blue grey#8D99A8,Cocoa#6E5A5A,Navy#27365A|Orange#E8731A,Golden yellow#EDB321,Camel#C49A5E,Tomato red#D9412A',
+'Soft Summer':'Dusty rose#C08A93,Mauve#9E7C97,Grey blue#7C93A8,Sage#8FA595,Soft teal#5F8E8C|Soft burgundy#8A4257,Dusky plum#6E4C6F,Jade#4E8C7E,Denim#50709A|Oyster#E3DDD3,Stone grey#9C9A96,Taupe#8A7B73,Charcoal blue#3F4A59|Black#111111,Neon orange#FF6A13,Bright yellow#FFD400,Hot pink#FF2E93',
+'Soft Autumn':'Dusty olive#8F8B5E,Terracotta rose#C48672,Soft teal#5E8A84,Wheat#D9BE8C,Salmon#E09F86|Rust#A65A3A,Moss#6E7B3F,Deep teal#2F6E6B,Aubergine#5E3F52|Oatmeal#E6DAC3,Khaki#B5A27F,Mushroom brown#8C7560,Coffee#4F3C2E|Black#111111,Fuchsia#D61C8C,Icy blue#CDE4F5,Pure white#FFFFFF',
+'True Autumn':'Pumpkin#D9772B,Mustard#C9982B,Olive#70762D,Rust#A84B24,Teal#1F7A78|Tomato#C93B22,Forest#2F5E37,Deep turquoise#17858A,Golden yellow#E0A526|Cream#F1E4C8,Camel#BF9358,Bronze brown#7A5230,Dark chocolate#3E2A1C|Black#111111,Cool pink#E08BB5,Icy lavender#D5CCF0,Blue grey#8D99A8',
+'Deep Autumn':'Oxblood#6E1F1F,Forest green#23482E,Rust#9C4521,Deep teal#114F52,Mustard gold#B8862B|Tomato red#B8321F,Burnt orange#C4621C,Aubergine#4A2540,Pine emerald#1B6B4A|Cream#EFE3CC,Camel#B88C55,Espresso#36241A,Olive black#2C2B22|Pastel pink#F4C6D7,Icy blue#CDE4F5,Lavender#C9BCE8,Cool grey#B5BAC2',
+'Deep Winter':'Burgundy#6B1532,Pine green#0E4A3C,Navy#14244F,True red#C2152B,Royal purple#4B2A8A|Fuchsia#C71C7F,Emerald#0E8A5C,Cobalt#1E4FCB,Lemon ice#F2EFA0|Black#111111,Charcoal#33363B,Pure white#FFFFFF,Black brown#2B1E1A|Peach#F7BE9A,Camel#C49A5E,Dusty orange#D9905B,Sage#94A187',
+'True Winter':'Royal blue#1F3FB0,Emerald#0B8F6A,Magenta#C2187A,True red#C8102E,Purple#5B2C9E|Hot pink#F0288C,Icy blue#C6E2F7,Lemon ice#F5F2A8,Cyan teal#008FA8|Black#111111,Pure white#FFFFFF,Cool grey#8E949E,Navy#17224D|Orange#E8731A,Mustard#C9982B,Rust#9A4521,Warm beige#D9BE98',
+'Bright Winter':'Electric blue#1456E0,Hot pink#F0288C,Emerald#00A36C,True red#D0102A,Violet#6B2FD0|Acid lemon#F2E63D,Cyan#00B7D9,Fuchsia#D1179B,Kelly green#14A84B|Black#111111,Pure white#FFFFFF,Icy grey#D5D9DF,Charcoal#33363B|Dusty rose#B58A8E,Khaki#B5A27F,Rust#9A4521,Mushroom#A3948A'};
+const GROUPS=['core','accent','neutral','avoid'];
+const SEASONS={};
+for(const[k,v]of Object.entries(SRC)){const o={};v.split('|').forEach((g,i)=>{o[GROUPS[i]]=g.split(',').map(c=>{const[name,hex]=c.split('#');return{name,hex:'#'+hex}})});SEASONS[k]=o}
+const SEASON_NAMES=Object.keys(SEASONS);
+const CATS=['top','bottom','one-piece','outerwear','shoes','accessory'];
+const FITS=['core','accent','neutral','off-palette'];
+const WEAR=['all','spring/summer','fall/winter'];
+const METALS=['Yellow gold','Rose gold','Silver','Mixed metals'];
+const BUDGETS=['tops','bottoms','outerwear','shoes','accessories'];
+const CSV_COLS=['item_id','name','category','subcategory','primary_color','secondary_color','palette_fit','material','formality','season','brand','size','notes'];
+const PRE={top:'TOP',bottom:'BTM','one-piece':'ONE',outerwear:'OUT',shoes:'SHO',accessory:'ACC'};
+const HUES={black:'#161616',white:'#F4F4F0',cream:'#EFE3CC',ivory:'#F3ECDC',navy:'#1F2C4F',charcoal:'#3A3C40',grey:'#8E9196',gray:'#8E9196',brown:'#6B4A32',espresso:'#36241A',beige:'#D6C3A1',tan:'#C19A6B',camel:'#BF9358',khaki:'#B5A27F',olive:'#70762D',green:'#2F6B3F',teal:'#1F7A78',blue:'#2F5FA8',denim:'#4A6A94',red:'#B8281F',burgundy:'#6B1532',oxblood:'#6E1F1F',rust:'#A84B24',orange:'#D9772B',mustard:'#C9982B',yellow:'#E8C53A',gold:'#B8862B',pink:'#E79AB3',purple:'#5B2C9E',plum:'#5B2A52',silver:'#BFC3C8'};
+const hueOf=n=>{n=String(n||'').toLowerCase();for(const k in HUES)if(n.includes(k))return HUES[k];return''};
+
+/* ---------- state ---------- */
+const S={view:'closet',phase:'boot',loadErr:'',uid:null,isOwner:false,
+  profile:null,insights:{},items:[],inspo:[],outfits:[],
+  filters:{category:'',palette_fit:'',season:'',formality:''},
+  pdraft:null,oform:{occasion:'',temp:'',anchor:''},suggestion:null,selfie:null,
+  email:'',ai:{images:true,maxImages:4,off:false,cool:0,busy:false},fb:{list:null,err:''}};
+let sb=null,E=null,ctl=null,loadTok=0;
+
+/* ---------- storage: one row per doc in Supabase; row-level security keeps each user's rows to themselves ---------- */
+const P={profile:()=>'profile',insights:()=>'insights',item:id=>'closet/'+id,inspo:id=>'inspo/'+id,outfit:id=>'outfits/'+id};
+const chains=new Map(),last=new Map();
+const queue=(path,job)=>{const p=(chains.get(path)||Promise.resolve()).catch(()=>{}).then(job);chains.set(path,p);return p};
+const must=r=>{if(r.error)throw{code:'db',message:r.error.message||''};return r.data};
+function allDocs(){const o=[];if(S.profile)o.push([P.profile(),S.profile]);if(Object.keys(S.insights).length)o.push([P.insights(),S.insights]);
+  S.items.forEach(x=>o.push([P.item(x.item_id),x]));S.inspo.forEach(x=>o.push([P.inspo(x.id),x]));S.outfits.forEach(x=>o.push([P.outfit(x.id),x]));return o}
+/* One write at a time per doc, and only when the doc changed. Callers update S first. */
+function save(path,data){return queue(path,async()=>{
+  const j=JSON.stringify(data);if(last.get(path)===j)return;
+  try{must(await withTimeout(sb.from('docs').upsert({user_id:S.uid,path,data,updated_at:new Date().toISOString()}),20000));last.set(path,j)}
+  catch(e){toast(/jwt|row-level|permission/i.test(e.message||'')?'Your session expired. Sign in again, then retry.':"That didn't save. Check your connection and try again.");throw e}})}
+function remove(path){return queue(path,async()=>{last.delete(path);must(await sb.from('docs').delete().eq('user_id',S.uid).eq('path',path))})}
+async function loadAll(){
+  const tok=++loadTok;S.phase='loading';S.loadErr='';render();
+  try{
+    let rows=[];for(let from=0;;from+=50){   /* 50 rows a page: each row can carry a ~100 KB photo */
+      const page=must(await withTimeout(sb.from('docs').select('path,data').eq('user_id',S.uid).order('path').range(from,from+49),10000));
+      if(tok!==loadTok)return;rows=rows.concat(page);if(page.length<50)break}
+    S.profile=null;S.insights={};S.items=[];S.inspo=[];S.outfits=[];
+    for(const{path:k,data:v}of rows){if(k==='profile')S.profile=v;else if(k==='insights')S.insights=v||{};else if(k.startsWith('closet/'))S.items.push(v);else if(k.startsWith('inspo/'))S.inspo.push(v);else if(k.startsWith('outfits/'))S.outfits.push(v)}
+    S.items=S.items.filter(i=>i&&i.item_id);S.inspo=S.inspo.filter(i=>i&&i.id);S.outfits=S.outfits.filter(i=>i&&i.id&&Array.isArray(i.items));
+    last.clear();for(const[p,d]of allDocs())last.set(p,JSON.stringify(d));
+    try{S.isOwner=must(await sb.rpc('is_owner'))===true}catch(e){S.isOwner=false}
+    S.phase='ready';
+  }catch(e){if(tok!==loadTok)return;S.phase='error';
+    S.loadErr=e&&e.code==='timeout'?'Your closet is taking longer than 10 seconds to load. Check your connection, then retry.':"Your data can't be reached right now. Retry in a moment."}
+  route();render();
+}
+
+/* ---------- photos ---------- */
+async function bitmap(file){
+  if(window.createImageBitmap){try{return await createImageBitmap(file,{imageOrientation:'from-image'})}catch(e){}}
+  return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{URL.revokeObjectURL(u);res(im)};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('decode'))};im.src=u});
+}
+/* 600px long edge, JPEG 0.7; steps down further only if still over ~100 KB. */
+async function shrink(file,edge=600,cap=133000){
+  const bm=await bitmap(file),w=bm.width,h=bm.height;let q=0.7,url='';
+  for(let i=0;i<7;i++){const k=Math.min(1,edge/Math.max(w,h)),c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));
+    const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(bm,0,0,c.width,c.height);
+    url=c.toDataURL('image/jpeg',q);if(url.length<=cap)break;if(q>0.5)q-=0.1;else edge=Math.round(edge*0.85)}
+  return url;
+}
+const dataBlob=u=>u.split(',')[1];   /* base64 JPEG, sent to the server function */
+
+/* ---------- Claude ---------- */
+const aiOK=()=>!S.ai.off;
+const aiWait=()=>Math.max(0,Math.ceil((S.ai.cool-Date.now())/1000));
+const aiBtn=(label,act,cls='')=>!aiOK()?'':`<button class="btn ${cls}" data-act="${act}" ${aiWait()||S.ai.busy?'disabled':''}>${aiWait()?`Claude is back in ${aiWait()}s`:label}</button>`;
+function salvage(t){if(!t)return;const a=t.search(/[{\[]/),b=Math.max(t.lastIndexOf('}'),t.lastIndexOf(']'));if(a<0||b<=a)return;try{return JSON.parse(t.slice(a,b+1))}catch(e){}}
+function busy(label,detail){const b=$('#busy');if(!label){b.classList.remove('open');return}$('#busy-l').textContent=label;$('#busy-d').textContent=detail||'';$('#busy-stop').hidden=!ctl;b.classList.add('open')}
+/* Every call is memoryless: the prompt carries instructions, data and the exact schema.
+   The Anthropic key lives in /api/claude; the browser only sends the signed-in user's token. */
+async function ask(label,prompt,{images,tier='default'}={}){
+  if(!aiOK())throw{code:'not_allowed',handled:true};
+  if(aiWait()){toast(`Claude needs a breather. Try again in ${aiWait()} seconds.`);throw{code:'rate_limited',handled:true}}
+  if(S.ai.busy){toast('One request at a time. Wait for the current one to finish.');throw{code:'busy',handled:true}}
+  S.ai.busy=true;ctl=new AbortController();busy(label,'Thinking…');
+  try{
+    const ses=(await sb.auth.getSession()).data.session;if(!ses)throw{code:'session_expired'};
+    const r=await fetch('/api/claude',{method:'POST',signal:ctl.signal,headers:{'content-type':'application/json',authorization:'Bearer '+ses.access_token},body:JSON.stringify({prompt,tier,images:images||[]})});
+    const body=await r.json().catch(()=>({}));
+    if(!r.ok)throw{code:body.code||'upstream_error'};
+    const v=salvage(body.text);if(v===undefined)throw{code:'invalid_json'};
+    return v}
+  catch(e){const c=e&&e.name==='AbortError'?'cancelled':(e&&e.code)||'upstream_error',err={code:c,handled:false};
+    const say=m=>{toast(m);err.handled=true};
+    if(c==='not_allowed'){S.ai.off=true;say("AI features aren't enabled for your account. Everything still works by hand.")}
+    else if(c==='not_configured'){S.ai.off=true;say("AI isn't set up on this site yet. Everything still works by hand.")}
+    else if(c==='daily_limit')say("You've used today's AI calls. They reset at midnight UTC.");
+    else if(c==='rate_limited'){S.ai.cool=Date.now()+90000;setTimeout(render,90500);say('Claude is rate-limited right now. The AI buttons come back in 90 seconds.')}
+    else if(c==='session_expired')say('Your session expired. Sign in again, then retry.');
+    else if(c==='too_large')say('That was too much to send at once. Try with fewer pieces or a smaller photo.');
+    else if(c==='cancelled')err.handled=true;
+    throw err}
+  finally{S.ai.busy=false;ctl=null;busy();render()}
+}
+const palLine=s=>{const p=SEASONS[s];return p?GROUPS.map(g=>`${g}: ${p[g].map(c=>c.name).join(', ')}`).join('; '):''};
+function profileBrief(){const p=S.profile||{};const b=BUDGETS.filter(k=>p.budgets&&p.budgets[k]).map(k=>`${k} up to $${p.budgets[k]}`).join(', ');
+  return [`Color season: ${p.season||'not set'}`,p.season?`Palette — ${palLine(p.season)}`:'',p.metals?`Metals: ${p.metals}`:'',p.style?`Style direction: ${p.style}`:'',
+    (p.height||p.build)?`Height/build: ${[p.height,p.build].filter(Boolean).join(', ')}`:'',p.measurements?`Measurements: ${p.measurements}`:'',p.fit_problems?`Fit problems: ${p.fit_problems}`:'',
+    b?`Budget per category: ${b}`:'',p.hard_nos?`Hard no's (never suggest): ${p.hard_nos}`:''].filter(Boolean).join('\n')}
+const rowOf=i=>[i.item_id,i.name,[i.category,i.subcategory].filter(Boolean).join('/'),[i.primary_color,i.secondary_color].filter(Boolean).join('+'),i.palette_fit||'unrated',i.material||'?',`formality ${i.formality||'?'}`,i.season||'all'].join(' | ');
+const closetRows=()=>'item_id | name | category | colors | palette_fit | material | formality | season\n'+S.items.slice(0,200).map(rowOf).join('\n');
+const JSON_ONLY='Reply with only JSON that matches the schema exactly. No prose, no code fence.';
+function tagPrompt(){const s=S.profile&&S.profile.season;return `You tag one clothing item from a photo for a wardrobe database. ${JSON_ONLY}
+${s?`The wearer's color season is ${s}. Palette — ${palLine(s)}.
+palette_fit: "core" if the main color matches or sits close to a core color; "accent" if close to an accent color; "neutral" if close to a neutral; "off-palette" if it is close to an avoid color or clashes with the season's warmth, depth or clarity.`:`No color season is set. Use palette_fit "neutral" for black, white, grey, navy, beige or brown, otherwise "accent".`}
+Schema: {"name": string, at most 6 words, "category": one of ${JSON.stringify(CATS)}, "subcategory": string such as "oxford shirt", "primary_color": plain color name, "secondary_color": plain color name or "", "palette_fit": one of ${JSON.stringify(FITS)}, "material": best guess such as "cotton twill", "formality": integer 1 (gym, lounge) to 5 (formal), "season": one of ${JSON.stringify(WEAR)}}`}
+function selfiePrompt(){return `Estimate a seasonal color analysis from this selfie. Judge only overall coloring: skin undertone, hair, eyes, and contrast between them. Indoor or tinted light misleads, so lower confidence when lighting looks artificial. ${JSON_ONLY}
+Schema: {"season": one of ${JSON.stringify(SEASON_NAMES)}, "runner_up": one of the same list, "confidence": "low" | "medium" | "high", "why": one sentence on undertone, depth and contrast}`}
+function inspoPrompt(n){return `There ${n>1?`are ${n} outfit inspiration screenshots, in order`:'is 1 outfit inspiration screenshot'}. For each image, extract what is worn. ${JSON_ONLY}
+Schema: a JSON array of exactly ${n} object${n>1?'s, in image order':''}: {"silhouettes": [..], "colors": [..], "fabrics": [..], "layering": [..], "footwear": [..]}
+Each list holds up to 4 short lowercase phrases of 1 to 3 words (for example "wide-leg trouser", "olive", "brushed wool", "overshirt over tee", "suede loafer"). Use an empty list when something is not visible. Use the same wording for the same thing across images.`}
+function tastePrompt(){const rows=S.inspo.filter(x=>x.analysis).map((x,i)=>`${i+1}. `+['silhouettes','colors','fabrics','layering','footwear'].map(k=>`${k}: ${(x.analysis[k]||[]).join(', ')||'-'}`).join(' | ')).join('\n');
+  return `Aggregate a taste profile from per-image outfit attributes. ${JSON_ONLY}
+${profileBrief()}
+
+Images (${S.inspo.filter(x=>x.analysis).length}):
+${rows}
+
+Group near-identical phrases into one pattern and count the images that show it. Keep patterns seen in 2 or more images (all of them if there are fewer than 4 images), highest count first, at most 12. For each, say whether it fits the user's palette and build. When it does not, say in one sentence how to get the same effect inside their palette.
+Schema: {"summary": one sentence describing the taste, "patterns": [{"pattern": string, "type": "silhouette" | "color" | "fabric" | "layering" | "footwear", "count": integer, "fits_palette": true | false, "adapt": string, "" when it fits}]}`}
+function historyLines(){const nm=id=>id;return S.outfits.filter(o=>o.status).sort((a,b)=>(b.ratedAt||0)-(a.ratedAt||0)).slice(0,20)
+  .map(o=>`- ${o.status==='wore'?'WORE IT':o.status==='swap'?'WORE WITH SWAP':'SKIPPED'} | ${o.occasion}, ${o.temp}°F | ${o.items.map(nm).join(', ')}${o.swap?` | swap offered: ${o.swap.out} -> ${o.swap.in}`:''}`).join('\n')}
+function outfitPrompt(f,temp){const h=historyLines();return `Build one outfit from the user's own closet. ${JSON_ONLY}
+${profileBrief()}
+
+Occasion: ${f.occasion.trim()}
+Temperature: ${temp}°F
+${f.anchor?`Anchor: the outfit must include item_id ${f.anchor} and be built around it.`:'No anchor item.'}
+
+Closet (use only these item_ids, copied exactly; never invent an item):
+${closetRows()}
+${h?`\nThe user's last outfit ratings, newest first. Lean toward what they wore, away from what they skipped, and apply swaps they chose:\n${h}\n`:''}
+Rules: a complete outfit for the temperature and occasion (a top and bottom or a one-piece, shoes, outerwear when it is cold, accessories only if they earn their place). Prefer core, accent and neutral pieces over off-palette ones. Respect the hard no's and fit problems.
+Schema: {"items": [item_id, ...], "reason": one line covering color, proportion and occasion, "swap": {"out": an item_id from items, "in": an item_id from the closet that is not in items, "why": short phrase}, "gap": one missing piece that would make this outfit better, or null}`}
+function gapsPrompt(){const t=S.insights.taste;return `Find the top 5 wardrobe gaps for this user. ${JSON_ONLY}
+${profileBrief()}
+
+Closet:
+${closetRows()}
+${t?`\nTaste profile: ${t.summary}\nRecurring patterns: ${(t.patterns||[]).map(p=>`${p.pattern} (${p.count})`).join(', ')}\n`:''}
+A gap is one durable piece the user does not own that would combine with pieces they do own. Rank by how many new outfits it unlocks. Be conservative with the count, and list the owned item_ids it pairs with. Describe the piece generically: no brand names, no product names. price_low and price_high are a target range in whole US dollars that respects the user's budget for that category; they are a budget guide, not a quote.
+Schema: {"gaps": [{"gap": short name of what is missing, "piece": {"item": string such as "chore jacket", "color": string, "cut": string, "fabric": string, "price_low": integer, "price_high": integer}, "unlocks": integer, "pairs_with": [item_id, ... up to 6], "why": one sentence on why it suits the user's palette and build}]} with exactly 5 gaps, best first.`}
+
+/* ---------- small UI helpers ---------- */
+let toastT;function toast(m){$('#toast-p').textContent=m;$('#toast').classList.add('open');clearTimeout(toastT);toastT=setTimeout(()=>$('#toast').classList.remove('open'),4200)}
+function openSheet(html){$('#sheet').innerHTML=html;$('#scrim').classList.add('open');const f=$('#sheet input:not([type=file]),#sheet textarea,#sheet button');if(f&&window.matchMedia('(min-width:600px)').matches)f.focus()}
+function closeSheet(){$('#scrim').classList.remove('open');$('#sheet').innerHTML='';E=null}
+const F=(label,name,val,attr='')=>`<label class="f" for="f-${name}"><span>${label}</span><input id="f-${name}" name="${name}" value="${esc(val)}" ${attr}></label>`;
+const TA=(label,name,val,ph='')=>`<label class="f" for="f-${name}"><span>${label}</span><textarea id="f-${name}" name="${name}" placeholder="${esc(ph)}">${esc(val)}</textarea></label>`;
+const SEL=(label,name,val,opts,attr='')=>`<label class="f" for="f-${name}"><span>${label}</span><select id="f-${name}" name="${name}" ${attr}>${opts.map(o=>{const[v,t]=Array.isArray(o)?o:[o,o];return`<option value="${esc(v)}" ${String(v)===String(val??'')?'selected':''}>${esc(t)}</option>`}).join('')}</select></label>`;
+const FILE=(label,key,attr='',cls='ghost')=>`<label class="btn ${cls}"><input class="vh" type="file" data-file="${key}" ${attr}>${label}</label>`;
+const formData=f=>Object.fromEntries(new FormData(f).entries());
+const itemBy=id=>S.items.find(i=>i.item_id===id);
+function fitPill(fit){if(!fit)return'<span class="pill"><i></i>unrated</span>';const p=SEASONS[S.profile&&S.profile.season];
+  if(fit==='off-palette')return'<span class="pill off"><i></i>off-palette</span>';
+  const c=p?(fit==='core'?p.core[0]:fit==='accent'?p.accent[0]:p.neutral[1]).hex:'';return`<span class="pill"><i ${c?`style="background:${c}"`:''}></i>${fit}</span>`}
+function palHTML(s){const p=SEASONS[s];if(!p)return'';return`<div class="pal">${GROUPS.map(g=>`<div class="g ${g}"><span>${g}</span><div class="sw">${p[g].map(c=>`<i style="background:${c.hex}" title="${esc(c.name)}" role="img" aria-label="${esc(c.name)}"></i>`).join('')}</div></div>`).join('')}</div>`}
+function saveFile(name,data){
+  const u=URL.createObjectURL(new Blob([data],{type:name.endsWith('.csv')?'text/csv':'application/json'})),a=document.createElement('a');
+  a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);toast('Saved '+name+'.');
+}
+
+/* ---------- chrome ---------- */
+const ICON={closet:'<path d="M12 7a2 2 0 1 0-2-2M12 7v2l8.5 6.2c.9.7.4 2.3-.8 2.3H4.3c-1.2 0-1.7-1.6-.8-2.3L12 9"/>',outfits:'<path d="M12 4 3 9l9 5 9-5-9-5ZM3 14l9 5 9-5"/>',inspo:'<path d="M7 4h10v16l-5-4-5 4V4Z"/>',shop:'<path d="M5 8h14l-1 12H6L5 8Zm4 0V6a3 3 0 0 1 6 0v2"/>',profile:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.5 3.5-5.5 7-5.5s6.2 2 7 5.5"/>',feedback:'<path d="M4 13 6.5 5h11L20 13v6H4v-6Zm0 0h5l1 2h4l1-2h5"/>'};
+const LABEL={closet:'Closet',outfits:'Outfits',inspo:'Inspo',shop:'Shop',profile:'Profile',feedback:'Feedback'};
+const tabList=()=>['closet','outfits','inspo','shop','profile'].concat(S.isOwner?['feedback']:[]);
+function chrome(){
+  const s=SEASONS[(S.view==='profile'&&S.pdraft&&S.pdraft.season)||(S.profile&&S.profile.season)];
+  $('#ribbon').innerHTML=s?[...s.core,...s.accent,...s.neutral].map(c=>`<i style="background:${c.hex}"></i>`).join(''):'';
+  if(s)document.documentElement.style.setProperty('--accent',s.core[0].hex);else document.documentElement.style.removeProperty('--accent');
+  $('#season-tag').textContent=(S.profile&&S.profile.season)||'';
+  $('#tabs').innerHTML=!S.uid?'':tabList().map(v=>`<button data-act="go" data-v="${v}" ${S.view===v?'aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${ICON[v]}</svg>${LABEL[v]}</button>`).join('');
+  const n=[],signedIn=S.phase==='ready'||S.phase==='loading'||S.phase==='error';
+  if(S.phase==='ready'&&S.ai.off)n.push('AI is unavailable for your account, so tagging, outfits and gaps are manual.');
+  $('nav.tabs').hidden=!signedIn;$('#fb-open').hidden=S.phase!=='ready';
+  $('#notice').textContent=n.join(' ');
+}
+function walkHTML(){const p=S.profile;if(p&&p.walkDismissed)return'';
+  const s1=!!(p&&p.season),s2=S.items.length>=5,s3=S.outfits.length>0||!!S.suggestion;if(s1&&s2&&s3)return'';
+  const now=!s1?1:!s2?2:3,go=now===1?['profile','Set up your profile']:now===2?['closet','Add a piece']:['outfits','Get an outfit'];
+  const li=(n,done,t)=>`<li class="${done?'done':n===now?'now':''}"><span class="n">${n}</span><span>${t}</span></li>`;
+  return`<section class="card walk" aria-label="Getting started"><h3>Getting started</h3><ol>${li(1,s1,'Set your color season and fit notes in Profile')}${li(2,s2,`Add 5 pieces to your closet (${Math.min(S.items.length,5)} of 5)`)}${li(3,s3,'Ask for your first outfit')}</ol>
+  <div class="row">${S.view!==go[0]?`<button class="btn small" data-act="go" data-v="${go[0]}">${go[1]}</button>`:''}${p?'<button class="btn ghost small" data-act="walk-dismiss">Hide this</button>':''}</div></section>`}
+
+/* ---------- Closet ---------- */
+function blankItem(){return{item_id:'',name:'',category:'top',subcategory:'',primary_color:'',secondary_color:'',palette_fit:'',material:'',formality:3,season:'all',brand:'',size:'',notes:'',photo:''}}
+function nextId(cat){const p=PRE[cat]||'ITM';let n=S.items.filter(i=>i.item_id.startsWith(p+'-')).length+1,id;do{id=p+'-'+String(n++).padStart(3,'0')}while(itemBy(id));return id}
+function thumb(i,cls='im'){return i.photo?`<img class="${cls}" src="${i.photo}" alt="" loading="lazy">`:`<span class="${cls}" style="background:${hueOf(i.primary_color)||'var(--wash)'}"></span>`}
+function closetView(){
+  const f=S.filters,list=S.items.filter(i=>(!f.category||i.category===f.category)&&(!f.palette_fit||i.palette_fit===f.palette_fit)&&(!f.season||i.season===f.season)&&(!f.formality||String(i.formality)===f.formality)).sort((a,b)=>CATS.indexOf(a.category)-CATS.indexOf(b.category)||a.name.localeCompare(b.name));
+  const cnt=k=>S.items.filter(i=>i.palette_fit===k).length,canTag=aiOK()&&S.ai.images;
+  const add=`<div class="row">${FILE('Take photo','item-photo','accept="image/*" capture="environment"','')}${FILE('Choose photo','item-photo','accept="image/*"')}<button class="btn ghost" data-act="item-new">Add by hand</button><button class="btn ghost" data-act="csv-open">Import CSV</button>${S.items.length?'<button class="btn ghost" data-act="csv-export">Export CSV</button>':''}</div>`;
+  let h=`<div class="head"><h1>Closet</h1><p class="sub">${S.items.length?`${S.items.length} piece${S.items.length>1?'s':''} · ${cnt('core')} core · ${cnt('accent')} accent · ${cnt('neutral')} neutral · ${cnt('off-palette')} off-palette`:'Nothing here yet'}</p></div>${add}`;
+  if(!S.items.length)return h+`<section class="empty"><h2>Start with what you wear most</h2><p>Lay one piece flat near a window and tap Take photo. ${canTag?'Claude fills in category, color, palette fit and formality, and you confirm before it saves.':'Fill in the details and save.'} Already keep a wardrobe.csv? Import it and add photos later.</p></section>`;
+  h+=`<div class="grid2">${[['category','Category',CATS],['palette_fit','Palette fit',FITS],['season','Season',WEAR],['formality','Formality',['1','2','3','4','5']]].map(([k,l,o])=>`<label class="f" for="flt-${k}"><span>${l}</span><select id="flt-${k}" data-filter="${k}">${[['','All'],...o.map(x=>[x,x])].map(([v,t])=>`<option value="${v}" ${f[k]===v?'selected':''}>${t}</option>`).join('')}</select></label>`).join('')}</div>`;
+  if(!list.length)return h+`<section class="empty"><h2>No pieces match</h2><p>Loosen a filter to see more of your closet.</p><button class="btn small" data-act="filters-clear">Clear filters</button></section>`;
+  return h+`<div class="grid">${list.map(i=>`<button class="item" data-act="item-edit" data-id="${esc(i.item_id)}">${thumb(i)}<span class="tx"><b>${esc(i.name||i.item_id)}</b><small>${esc([i.subcategory||i.category,i.primary_color].filter(Boolean).join(' · '))} · F${esc(i.formality)}</small><span>${fitPill(i.palette_fit)}</span></span></button>`).join('')}</div>`;
+}
+function itemForm(i,isNew,note){return`<form id="item-form" data-form="item" data-submit="item-save" novalidate>
+  <h2>${isNew?'New piece':'Edit piece'}</h2>
+  <div class="row" style="align-items:flex-end"><span id="item-ph">${E.photo?`<img class="ph" src="${E.photo}" alt="Photo of this piece">`:''}</span><div class="stack">${FILE(E.photo?'Replace photo':'Add photo','item-rephoto','accept="image/*"','ghost small')}${aiOK()&&S.ai.images?'<button type="button" class="btn ghost small" data-act="item-retag">Auto-fill with Claude</button>':''}</div></div>
+  <p class="hint" id="item-note">${esc(note||'')}</p>
+  ${F('Name','name',i.name,'required maxlength="80" placeholder="Olive chore jacket"')}
+  <div class="grid2">${SEL('Category','category',i.category,CATS)}${F('Subcategory','subcategory',i.subcategory,'maxlength="60" placeholder="chore jacket"')}</div>
+  <div class="grid2">${F('Primary color','primary_color',i.primary_color,'maxlength="40"')}${F('Secondary color','secondary_color',i.secondary_color,'maxlength="40"')}</div>
+  <div class="grid2">${SEL('Palette fit'+(S.profile&&S.profile.season?` for ${S.profile.season}`:''),'palette_fit',i.palette_fit,[['','Not rated'],...FITS])}${F('Material','material',i.material,'maxlength="60"')}</div>
+  <div class="grid2">${SEL('Formality','formality',i.formality,[[1,'1 · gym, lounge'],[2,'2 · casual'],[3,'3 · smart casual'],[4,'4 · business'],[5,'5 · formal']])}${SEL('Season','season',i.season,WEAR)}</div>
+  <div class="grid2">${F('Brand','brand',i.brand,'maxlength="60"')}${F('Size','size',i.size,'maxlength="30"')}</div>
+  ${TA('Notes','notes',i.notes)}
+  <div class="row"><button class="btn" type="submit">Save piece</button><button class="btn ghost" type="button" data-act="sheet-close">Cancel</button>${isNew?'':'<button class="btn danger" type="button" data-act="item-delete">Delete</button>'}</div></form>`}
+function openItem(item,isNew,note){E={orig:item,isNew,dirty:new Set(),photo:item.photo||''};openSheet(itemForm(item,isNew,note))}
+const setNote=t=>{const n=$('#item-note');if(n)n.textContent=t};
+const oneOf=(v,list,d)=>{v=String(v??'').toLowerCase().trim();return list.includes(v)?v:d};
+function applyTags(r){const f=$('#item-form');if(!f||!r||typeof r!=='object')return;
+  const v={name:String(r.name||'').slice(0,80),category:oneOf(r.category,CATS,''),subcategory:String(r.subcategory||'').slice(0,60),primary_color:String(r.primary_color||'').slice(0,40),secondary_color:String(r.secondary_color||'').slice(0,40),palette_fit:oneOf(r.palette_fit,FITS,''),material:String(r.material||'').slice(0,60),formality:Math.min(5,Math.max(1,Math.round(Number(r.formality))||3)),season:oneOf(r.season,WEAR,'all')};
+  for(const k in v){if(E.dirty.has(k)||v[k]==='')continue;if(f.elements[k])f.elements[k].value=v[k]}}
+async function tagOpenItem(){const mine=E;if(!mine||!mine.photo)return;setNote('Claude is reading the photo. Keep typing if you like; your edits win.');
+  try{const r=await ask('Reading your photo',tagPrompt(),{images:[dataBlob(mine.photo)],tier:'quick'});if(E!==mine)return;applyTags(r);setNote('Claude filled these in. Check them, then save.')}
+  catch(e){if(E===mine)setNote(e.code==='cancelled'?'Stopped. Fill in the details by hand.':"Auto-fill didn't work this time. Fill in the details by hand.")}}
+async function itemSave(){const f=$('#item-form');if(!f||!E)return;const d=formData(f);
+  if(!d.name.trim()){toast('Give the piece a name.');f.elements.name.focus();return}
+  const it={...E.orig};CSV_COLS.forEach(k=>{if(k!=='item_id')it[k]=String(d[k]??'').trim()});it.formality=Number(d.formality)||3;it.photo=E.photo;
+  if(E.isNew){it.item_id=nextId(it.category);it.created=Date.now();S.items.push(it)}else{const ix=S.items.findIndex(x=>x.item_id===it.item_id);if(ix>=0)S.items[ix]=it}
+  closeSheet();render();try{await save(P.item(it.item_id),it)}catch(e){}}
+
+/* CSV, in the wardrobe.csv column order */
+const csvCell=v=>{v=String(v??'');return/[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+const toCSV=()=>[CSV_COLS.join(','),...S.items.map(i=>CSV_COLS.map(c=>csvCell(i[c])).join(','))].join('\n')+'\n';
+function parseCSV(t){const rows=[];let r=[],f='',q=false;t=t.replace(/^﻿/,'');
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;else if(c===','){r.push(f);f=''}
+    else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;r.push(f);f='';if(r.some(x=>x.trim()))rows.push(r);r=[]}else f+=c}
+  r.push(f);if(r.some(x=>x.trim()))rows.push(r);return rows}
+const ALIAS={itemid:'item_id',id:'item_id',name:'name',item:'name',itemname:'name',title:'name',category:'category',cat:'category',type:'category',subcategory:'subcategory',subtype:'subcategory',primarycolor:'primary_color',color:'primary_color',colour:'primary_color',maincolor:'primary_color',secondarycolor:'secondary_color',palettefit:'palette_fit',palette:'palette_fit',material:'material',fabric:'material',formality:'formality',season:'season',seasons:'season',brand:'brand',size:'size',notes:'notes',note:'notes',comments:'notes'};
+function normCat(v){v=String(v||'').toLowerCase();if(CATS.includes(v))return v;if(/dress|jumpsuit|one/.test(v))return'one-piece';if(/outer|jacket|coat|blazer/.test(v))return'outerwear';if(/shoe|boot|sneaker|foot|loafer/.test(v))return'shoes';if(/access|belt|bag|hat|scarf|watch|jewel|tie/.test(v))return'accessory';if(/bottom|pant|jean|trouser|short|skirt|chino/.test(v))return'bottom';return'top'}
+function normWear(v){v=String(v||'').toLowerCase();const c=/winter|fall|autumn|cold/.test(v),w=/spring|summer|warm/.test(v);return c&&!w?'fall/winter':w&&!c?'spring/summer':'all'}
+function normFit(v){v=String(v||'').toLowerCase().trim();if(FITS.includes(v))return v;return/off/.test(v)?'off-palette':''}
+async function importCSV(text){
+  const rows=parseCSV(text);if(rows.length<2){toast('That file has no rows under the header.');return}
+  const head=rows[0].map(h=>ALIAS[h.toLowerCase().replace(/[^a-z0-9]/g,'')]||'');
+  if(!head.includes('name')&&!head.includes('item_id')){toast('The header needs at least a name or item_id column.');return}
+  closeSheet();let added=0,updated=0,skipped=0,failed=0;
+  for(let n=1;n<rows.length;n++){const raw={};head.forEach((k,i)=>{if(k)raw[k]=(rows[n][i]||'').trim()});
+    if(!raw.name&&!raw.item_id){skipped++;continue}
+    let id=String(raw.item_id||'').replace(/[^A-Za-z0-9_~:@+-]/g,'-').slice(0,60);const cat=normCat(raw.category||raw.subcategory||raw.name);
+    const old=id&&itemBy(id);if(!id)id=nextId(cat);
+    const it={...blankItem(),...(old||{}),item_id:id,name:(raw.name||id).slice(0,80),category:cat,subcategory:raw.subcategory??(old?old.subcategory:''),primary_color:raw.primary_color??(old?old.primary_color:''),secondary_color:raw.secondary_color??(old?old.secondary_color:''),
+      palette_fit:raw.palette_fit!==undefined?normFit(raw.palette_fit):(old?old.palette_fit:''),material:raw.material??(old?old.material:''),formality:Math.min(5,Math.max(1,Math.round(Number(raw.formality))||(old?old.formality:3))),season:raw.season!==undefined?normWear(raw.season):(old?old.season:'all'),brand:raw.brand??(old?old.brand:''),size:raw.size??(old?old.size:''),notes:raw.notes??(old?old.notes:'')};
+    if(!old)it.created=Date.now();
+    if(old)S.items[S.items.indexOf(old)]=it;else S.items.push(it);
+    busy('Importing',`${n} of ${rows.length-1}`);
+    try{await save(P.item(id),it);old?updated++:added++}catch(e){failed++;if(failed>2)break}
+  }
+  busy();render();toast(`Imported ${added} new, updated ${updated}${skipped?`, skipped ${skipped} without a name`:''}${failed?`, ${failed} failed to save`:''}.`);
+}
+
+/* ---------- Inspo ---------- */
+const AKEYS=['silhouettes','colors','fabrics','layering','footwear'];
+function cleanAnalysis(a){if(!a||typeof a!=='object')return null;const o={};AKEYS.forEach(k=>{o[k]=(Array.isArray(a[k])?a[k]:[]).map(x=>String(x).toLowerCase().trim().slice(0,40)).filter(Boolean).slice(0,5)});return AKEYS.some(k=>o[k].length)?o:null}
+function inspoView(){const read=S.inspo.filter(x=>x.analysis).length,todo=S.inspo.length-read,t=S.insights.taste;
+  let h=`<div class="head"><h1>Inspo</h1><p class="sub">${S.inspo.length?`${S.inspo.length} screenshot${S.inspo.length>1?'s':''} · ${read} read`:'No screenshots yet'}</p></div>
+  <div class="row">${FILE('Add screenshots','inspo-add','accept="image/*" multiple','')}${todo&&S.ai.images?aiBtn(`Read ${todo} new with Claude`,'inspo-read','ghost'):''}${read>=2?aiBtn(t?'Rebuild taste profile':'Build taste profile','taste-build','ghost'):''}</div>`;
+  if(!S.inspo.length)return h+`<section class="empty"><h2>Save looks, then bring them here</h2><p>Screenshot outfits you like on Pinterest or Instagram and add the screenshots. Nothing is fetched from the web. ${aiOK()?'Claude reads silhouettes, colors, fabrics, layering and footwear from each one, then finds what keeps repeating.':'Keep them here as a reference board.'}</p></section>`;
+  if(t&&t.patterns&&t.patterns.length){const mx=Math.max(...t.patterns.map(p=>p.count),1);
+    h+=`<section class="card"><h3>Taste profile · from ${t.n} screenshot${t.n>1?'s':''}</h3><p class="why" style="font:italic 400 19px/1.35 var(--display)">${esc(t.summary)}</p><div>${t.patterns.map(p=>`<div class="pat"><div><b>${esc(p.pattern)}</b> <span class="chip">${esc(p.type)}</span> ${p.fits_palette?'<span class="pill good"><i></i>fits your palette</span>':'<span class="pill adapt"><i></i>adapt</span>'}</div><span class="cnt">×${p.count}</span><div class="meter"><i style="width:${Math.round(p.count/mx*100)}%"></i></div>${p.fits_palette||!p.adapt?'':`<p>${esc(p.adapt)}</p>`}</div>`).join('')}</div></section>`}
+  else if(read>=2)h+=`<p class="hint">${aiOK()?'Build the taste profile to see which patterns repeat and which fit your palette.':''}</p>`;
+  else if(aiOK())h+=`<p class="hint">Read at least 2 screenshots to build a taste profile.</p>`;
+  return h+`<div class="grid">${S.inspo.slice().sort((a,b)=>b.created-a.created).map(x=>`<button class="item" data-act="inspo-open" data-id="${x.id}"><img class="im" src="${x.photo}" alt="Inspiration screenshot" loading="lazy"><span class="tx">${x.analysis?`<span class="chips">${[...x.analysis.silhouettes.slice(0,2),...x.analysis.colors.slice(0,2)].map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</span>`:'<small>Not read yet</small>'}</span></button>`).join('')}</div>`}
+async function inspoAdd(files){let ok=0,bad=0;
+  for(let i=0;i<files.length;i++){busy('Adding screenshots',`${i+1} of ${files.length}`);
+    try{const x={id:'in'+rid(),photo:await shrink(files[i]),created:Date.now(),analysis:null};S.inspo.push(x);await save(P.inspo(x.id),x);ok++}catch(e){bad++}}
+  busy();render();if(bad)toast(`${bad} image${bad>1?'s':''} couldn't be added. Try JPEG or PNG screenshots.`)}
+async function inspoRead(){const todo=S.inspo.filter(x=>!x.analysis),per=Math.max(1,Math.min(4,S.ai.maxImages||1));let done=0;
+  for(let i=0;i<todo.length;i+=per){const batch=todo.slice(i,i+per);let r;
+    try{r=await ask(`Reading screenshots ${i+1} to ${Math.min(i+per,todo.length)} of ${todo.length}`,inspoPrompt(batch.length),{images:batch.map(b=>dataBlob(b.photo)),tier:'quick'})}
+    catch(e){if(!e.handled)toast('Reading stopped partway. Run it again to finish the rest.');break}
+    if(!Array.isArray(r))r=[r];
+    for(let k=0;k<batch.length;k++){const a=cleanAnalysis(r[k]);if(!a)continue;batch[k].analysis=a;try{await save(P.inspo(batch[k].id),batch[k]);done++}catch(e){}}
+    render()}
+  if(done)toast(`Read ${done} screenshot${done>1?'s':''}.`)}
+async function tasteBuild(){let r;try{r=await ask('Finding your patterns',tastePrompt())}catch(e){if(!e.handled)toast("The taste profile didn't come back cleanly. Try again.");return}
+  const n=S.inspo.filter(x=>x.analysis).length,pats=(r&&Array.isArray(r.patterns)?r.patterns:[]).map(p=>({pattern:String(p.pattern||'').slice(0,60),type:oneOf(p.type,['silhouette','color','fabric','layering','footwear'],'silhouette'),count:Math.min(n,Math.max(1,Math.round(Number(p.count))||1)),fits_palette:p.fits_palette===true,adapt:String(p.adapt||'').slice(0,240)})).filter(p=>p.pattern).sort((a,b)=>b.count-a.count).slice(0,12);
+  if(!pats.length){toast('Claude found no repeating patterns yet. Add more screenshots.');return}
+  S.insights={...S.insights,taste:{summary:String(r.summary||'').slice(0,300),patterns:pats,n,at:Date.now()}};render();try{await save(P.insights(),S.insights)}catch(e){}}
+
+/* ---------- Outfits ---------- */
+function layHTML(ids){const its=ids.map(id=>itemBy(id)||{item_id:id,name:'Removed piece',category:'accessory',missing:true}).sort((a,b)=>['outerwear','top','one-piece','bottom','shoes','accessory'].indexOf(a.category)-['outerwear','top','one-piece','bottom','shoes','accessory'].indexOf(b.category));
+  return`<div class="lay">${its.map(i=>`<div class="t ${i.category}">${i.photo?`<img src="${i.photo}" alt="${esc(i.name)}">`:`<div class="blk" style="background:${hueOf(i.primary_color)||'var(--card)'}"></div>`}<span>${esc(i.name)}</span></div>`).join('')}</div>`}
+const nameOf=id=>{const i=itemBy(id);return i?i.name:'a removed piece'};
+function outfitBody(o){return`${layHTML(o.items)}<p class="why">${esc(o.reason)}</p>${o.swap?`<p class="kv"><b>Swap:</b> ${esc(nameOf(o.swap.out))} for ${esc(nameOf(o.swap.in))}${o.swap.why?` (${esc(o.swap.why)})`:''}</p>`:''}${o.gap?`<p class="kv"><b>Gap:</b> ${esc(o.gap)}</p>`:''}`}
+function outfitsView(){const f=S.oform,enough=S.items.length>=3;
+  let h=`<div class="head"><h1>Outfits</h1><p class="sub">${S.outfits.length?`${S.outfits.length} saved · ${S.outfits.filter(o=>o.status).length} logged`:'Built only from pieces you own'}</p></div>`;
+  if(!enough)return h+`<section class="empty"><h2>Add a few pieces first</h2><p>An outfit needs at least a top, a bottom and shoes from your closet. You have ${S.items.length} piece${S.items.length===1?'':'s'}.</p><button class="btn small" data-act="go" data-v="closet">Open closet</button></section>`;
+  if(aiOK())h+=`<form class="card" data-form="outfit" data-submit="outfit-build" novalidate>
+    <div class="grid2">${F('Occasion','occasion',f.occasion,'maxlength="80" placeholder="Dinner with friends"')}${F('Temperature (°F)','temp',f.temp,'type="number" inputmode="numeric" min="-40" max="130" placeholder="45" style="max-width:140px"')}</div>
+    <div class="row">${['Office','Date night','Weekend errands','Dinner with friends'].map(o=>`<button type="button" class="btn ghost small ${f.occasion===o?'on':''}" data-act="occasion" data-v="${o}">${o}</button>`).join('')}</div>
+    ${SEL('Anchor piece (optional)','anchor',f.anchor,[['','No anchor'],...S.items.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(i=>[i.item_id,`${i.name} · ${i.item_id}`])])}
+    <div class="row">${aiBtn('Build outfit','outfit-build')}</div></form>`;
+  else h+=`<p class="hint">Outfit suggestions need Claude, which is unavailable in this view. Saved outfits below still work.</p>`;
+  const s=S.suggestion;
+  if(s)h+=`<section class="card outfit"><h3>Suggested · ${esc(s.occasion)} · ${esc(s.temp)}°F</h3>${outfitBody(s)}<div class="row"><button class="btn" data-act="outfit-save">Save outfit</button>${aiBtn('Try another','outfit-again','ghost')}</div></section>`;
+  if(!S.outfits.length&&!s)h+=`<section class="empty"><h2>No outfits yet</h2><p>Type an occasion and today's temperature, then tap Build outfit. Save the ones you like and log whether you wore them, so the next suggestions get closer.</p></section>`;
+  h+=S.outfits.slice().sort((a,b)=>b.created-a.created).map(o=>`<section class="card outfit"><h3>${esc(o.occasion)} · ${esc(o.temp)}°F · ${day(o.created)}</h3>${outfitBody(o)}
+    <div class="row" role="group" aria-label="Log this outfit">${[['wore','Wore it'],['swap','Wore with a swap'],['skipped','Skipped']].map(([k,l])=>`<button class="btn ghost small ${o.status===k?'on':''}" data-act="outfit-log" data-id="${o.id}" data-v="${k}" aria-pressed="${o.status===k}">${l}</button>`).join('')}<button class="btn ghost small" data-act="outfit-delete" data-id="${o.id}">Remove</button></div></section>`).join('');
+  return h}
+function checkOutfit(r,anchor){if(!r||typeof r!=='object'||!Array.isArray(r.items))return'the reply had no items list';
+  const ids=r.items.map(String);if(ids.length<2||ids.length>8)return'items must list 2 to 8 item_ids';
+  if(new Set(ids).size!==ids.length)return'an item_id was repeated';
+  const bad=ids.filter(id=>!itemBy(id));if(bad.length)return`these item_ids are not in the closet: ${bad.join(', ')}`;
+  if(anchor&&!ids.includes(anchor))return`the anchor ${anchor} was missing`;
+  if(!String(r.reason||'').trim())return'the reason was empty';
+  if(r.swap){const o=String(r.swap.out||''),i=String(r.swap.in||'');if(!ids.includes(o))return`swap.out ${o} is not in items`;if(!itemBy(i)||ids.includes(i))return`swap.in ${i} must be a closet item that is not already in items`}
+  return''}
+async function outfitBuild(fresh){const f=S.oform;if(!f.occasion.trim()){toast('Say what the outfit is for.');return}
+  const temp=Number(f.temp);if(f.temp===''||!isFinite(temp)||temp<-40||temp>130){toast('Type the temperature in °F.');return}
+  if(f.anchor&&!itemBy(f.anchor))f.anchor='';
+  const p=outfitPrompt(f,temp);let out=null,err='';
+  for(let a=0;a<2&&!out;a++){   /* one retry on a bad response, then stop */
+    try{const r=await ask(a?'Checking the outfit again':'Building your outfit',a?`${p}\n\nYour previous reply was rejected because ${err}. Copy item_ids exactly from the closet list.`:p);err=checkOutfit(r,f.anchor);if(!err)out=r}
+    catch(e){if(e.handled)return;if(e.code!=='invalid_json'&&e.code!=='empty_completion')break;err='it was not valid JSON'}}
+  if(!out){toast("Claude couldn't build a valid outfit from your closet this time. Try again, or change the occasion.");return}
+  S.suggestion={items:out.items.map(String),reason:String(out.reason).slice(0,300),swap:out.swap?{out:String(out.swap.out),in:String(out.swap.in),why:String(out.swap.why||'').slice(0,120)}:null,gap:out.gap?String(out.gap).slice(0,200):null,occasion:f.occasion.trim(),temp,anchor:f.anchor||''};render()}
+
+/* ---------- Shop ---------- */
+const shopURL=p=>'https://www.google.com/search?tbm=shop&q='+encodeURIComponent([p.color,p.cut,p.item,p.fabric].filter(Boolean).join(' '));
+function shopView(){const g=S.insights.gaps;
+  let h=`<div class="head"><h1>Shop</h1><p class="sub">${g?`Top ${g.list.length} gaps · checked ${day(g.at)} against ${g.n} pieces`:'Buy only what fills a gap'}</p></div>`;
+  if(S.items.length<5)return h+`<section class="empty"><h2>Gaps need a closet to measure</h2><p>Add at least 5 pieces so the analysis can count the outfits a new piece would unlock. You have ${S.items.length}.</p><button class="btn small" data-act="go" data-v="closet">Open closet</button></section>`;
+  h+=`<div class="row">${aiBtn(g?'Check gaps again':'Find my 5 gaps','gaps-find')}</div>`;
+  if(!g)return h+`<section class="empty"><h2>No gap analysis yet</h2><p>${aiOK()?'Tap Find my 5 gaps. Claude weighs your closet, profile and taste profile, then ranks the pieces that unlock the most new outfits.':'Gap analysis needs Claude, which is unavailable in this view.'}</p></section>`;
+  h+=g.list.map((x,n)=>`<section class="card"><h3>Gap ${n+1} · unlocks about ${x.unlocks} outfit${x.unlocks===1?'':'s'}</h3><h2>${esc(x.gap)}</h2>
+    <p>${esc([x.piece.color,x.piece.cut,x.piece.item].filter(Boolean).join(' '))}${x.piece.fabric?` in ${esc(x.piece.fabric)}`:''}</p>
+    ${x.pairs_with.length?`<div class="chips">${x.pairs_with.map(id=>`<span class="chip">${esc(nameOf(id))}</span>`).join('')}</div>`:''}
+    <p class="hint">${esc(x.why)}</p>
+    ${x.piece.price_high?`<p class="kv"><b>Target range:</b> $${x.piece.price_low}–$${x.piece.price_high} <span class="hint">(a budget guide, not a live price)</span></p>`:''}
+    <div class="row"><a class="btn ghost small" href="${esc(shopURL(x.piece))}" target="_blank" rel="noopener noreferrer">Search Google Shopping</a></div></section>`).join('');
+  return h+`<p class="hint">Links open a Google Shopping search built from the description. Nothing here is a specific product, price or stock check.</p>`}
+async function gapsFind(){let r;try{r=await ask('Finding your gaps',gapsPrompt())}catch(e){if(!e.handled)toast("The gap analysis didn't come back cleanly. Try again.");return}
+  const int=v=>Math.max(0,Math.round(Number(v))||0),list=(r&&Array.isArray(r.gaps)?r.gaps:[]).map(x=>{const p=x&&x.piece||{};return{gap:String(x&&x.gap||'').slice(0,80),piece:{item:String(p.item||'').slice(0,60),color:String(p.color||'').slice(0,40),cut:String(p.cut||'').slice(0,60),fabric:String(p.fabric||'').slice(0,60),price_low:int(p.price_low),price_high:int(p.price_high)},unlocks:int(x&&x.unlocks),pairs_with:(Array.isArray(x&&x.pairs_with)?x.pairs_with:[]).map(String).filter(itemBy).slice(0,6),why:String(x&&x.why||'').slice(0,300)}}).filter(x=>x.gap&&x.piece.item).slice(0,5);
+  if(!list.length){toast("Claude didn't return usable gaps. Try again.");return}
+  S.insights={...S.insights,gaps:{list,n:S.items.length,at:Date.now()}};render();try{await save(P.insights(),S.insights)}catch(e){}}
+
+/* ---------- Profile ---------- */
+const blankProfile=()=>({season:'',metals:'',style:'',height:'',build:'',measurements:'',sizes:'',fit_problems:'',budgets:{},hard_nos:''});
+function profileView(){if(!S.pdraft)S.pdraft={...blankProfile(),...(S.profile||{}),budgets:{...((S.profile||{}).budgets||{})}};const d=S.pdraft,e=S.selfie;
+  return`<div class="head"><h1>Profile</h1><p class="sub">${S.profile?'Private to you. Edit any time.':'Start here. Everything else is judged against this.'}</p></div>
+  <form class="stack" data-form="profile" data-submit="profile-save" novalidate>
+    <section class="card"><h3>Color</h3>${SEL('Color season','season',d.season,[['','Choose a season'],...SEASON_NAMES])}
+      ${d.season?palHTML(d.season):'<p class="hint">Pick the season from your color analysis to see its palette. Not sure? Choose the closest and change it later.</p>'}
+      ${aiOK()&&S.ai.images?`<div class="row">${FILE('Estimate from a daylight selfie','selfie','accept="image/*"','ghost small')}</div><p class="hint">Estimate, not a substitute for a draped analysis. The selfie goes to Claude once and is not saved.</p>`:''}
+      ${e?`<div class="card"><h3>Estimate, not a substitute for a draped analysis</h3><p><b>${esc(e.season)}</b> · ${esc(e.confidence)} confidence${e.runner_up&&e.runner_up!==e.season?` · runner-up ${esc(e.runner_up)}`:''}</p><p class="hint">${esc(e.why)}</p><div class="row"><button type="button" class="btn small" data-act="selfie-use">Use ${esc(e.season)}</button></div></div>`:''}
+      ${SEL('Metals','metals',d.metals,[['','Choose'],...METALS])}</section>
+    <section class="card"><h3>Style and fit</h3>${F('Style direction, 3 to 5 words','style',d.style,'maxlength="80" placeholder="relaxed tailored earthy workwear"')}
+      <div class="grid2">${F('Height','height',d.height,'maxlength="20" placeholder="5 ft 10"')}${F('Build','build',d.build,'maxlength="40" placeholder="athletic, broad shoulders"')}</div>
+      ${TA('Measurements','measurements',d.measurements,'chest 40, waist 32, inseam 30, shoulder 18.5')}${TA('Sizes by brand','sizes',d.sizes,'Uniqlo M · Levi\'s 32x30 · Nike 10.5')}${TA('Fit problems','fit_problems',d.fit_problems,'sleeves run long, thighs tight in slim cuts')}${TA("Hard no's",'hard_nos',d.hard_nos,'skinny jeans, logos, silver hardware')}</section>
+    <section class="card"><h3>Budget per piece, in dollars</h3><div class="grid2">${BUDGETS.map(b=>F(b[0].toUpperCase()+b.slice(1),'budget_'+b,d.budgets[b]??'','type="number" inputmode="numeric" min="0" max="100000" placeholder="0"')).join('')}</div></section>
+    <div class="row"><button class="btn" type="submit">Save profile</button></div>
+  </form>
+  <section class="card"><h3>Your data</h3><p class="hint">Signed in as ${esc(S.email)}. Only you can read your closet through the app; whoever runs this site administers the database.</p>
+    <div class="row"><button class="btn ghost small" data-act="data-export">Export my data</button><button class="btn danger small" data-act="data-delete">Delete my data</button><button class="btn ghost small" data-act="sign-out">Sign out</button></div></section>`}
+function syncProfile(f){const d=formData(f),p=S.pdraft||(S.pdraft=blankProfile());['season','metals','style','height','build','measurements','sizes','fit_problems','hard_nos'].forEach(k=>{p[k]=String(d[k]??'')});
+  p.budgets={};BUDGETS.forEach(b=>{const v=Math.round(Number(d['budget_'+b]));if(v>0)p.budgets[b]=v})}
+async function profileSave(){const f=$('form[data-form=profile]');if(f)syncProfile(f);const d=S.pdraft;
+  if(!d.season){toast('Choose a color season first.');return}
+  const words=d.style.trim().split(/\s+/).filter(Boolean).length,first=!S.profile;
+  S.profile={...(S.profile||{}),...d,style:d.style.trim(),updated:Date.now()};S.pdraft=null;S.selfie=null;
+  if(first)go('closet');else render();
+  try{await save(P.profile(),S.profile);toast(words&&(words<3||words>5)?'Saved. Style direction works best at 3 to 5 words.':first?'Profile saved. Now add your first pieces.':'Profile saved.')}catch(e){}}
+async function selfie(files){let url;try{url=await shrink(files[0],900,400000)}catch(e){toast("That photo couldn't be opened. Try a JPEG or PNG.");return}
+  try{const r=await ask('Estimating your season',selfiePrompt(),{images:[dataBlob(url)]});
+    const s=SEASON_NAMES.find(n=>n.toLowerCase()===String(r&&r.season||'').toLowerCase());if(!s){toast("Claude couldn't settle on a season from that photo. Try one in daylight.");return}
+    S.selfie={season:s,runner_up:SEASON_NAMES.find(n=>n.toLowerCase()===String(r.runner_up||'').toLowerCase())||'',confidence:oneOf(r.confidence,['low','medium','high'],'low'),why:String(r.why||'').slice(0,300)};render()}
+  catch(e){if(!e.handled)toast("The estimate didn't come back. Try again with a daylight photo.")}}
+function exportData(){const pack=strip=>JSON.stringify({app:'Fit Check',exported_at:new Date().toISOString(),profile:S.profile,insights:S.insights,items:strip?S.items.map(({photo,...r})=>r):S.items,inspiration:strip?S.inspo.map(({photo,...r})=>r):S.inspo,outfits:S.outfits},null,1);
+  saveFile('fit-check-export.json',pack(false))}
+async function deleteData(){closeSheet();busy('Deleting your data','');
+  try{must(await sb.from('docs').delete().eq('user_id',S.uid))}catch(e){busy();toast("Deleting didn't go through. Check your connection and try again.");return}
+  busy();last.clear();S.profile=null;S.insights={};S.items=[];S.inspo=[];S.outfits=[];S.suggestion=null;S.pdraft=null;S.selfie=null;go('profile');toast('Your profile, closet, inspiration and outfits are deleted.')}
+
+/* ---------- Feedback ---------- */
+function feedbackSheet(){openSheet(`<form data-form="fb" data-submit="feedback-send" novalidate><h2>Send feedback</h2><p class="hint">About the ${LABEL[S.view]} screen. Only the owner of this app can read it.</p>
+  <label class="f" for="fb-text"><span>What worked, what broke, what's missing?</span><textarea id="fb-text" name="text" rows="5" maxlength="2000"></textarea></label>
+  <div class="f"><span id="fb-rl">Rating (optional)</span><div class="stars" role="group" aria-labelledby="fb-rl">${[1,2,3,4,5].map(n=>`<button type="button" class="btn ghost small" data-act="fb-rate" data-v="${n}" aria-pressed="false">${n}</button>`).join('')}</div><input type="hidden" name="rating" id="fb-rating" value=""></div>
+  <div class="row"><button class="btn" type="submit">Send</button><button class="btn ghost" type="button" data-act="sheet-close">Cancel</button></div></form>`)}
+async function feedbackSend(){const f=$('form[data-form=fb]');if(!f)return;const d=formData(f),text=d.text.trim();if(!text){toast('Write a line of feedback first.');return}
+  try{must(await withTimeout(sb.from('feedback').insert({user_id:S.uid,email:S.email,body:text.slice(0,2000),rating:Number(d.rating)||null,view:S.view}),10000));
+    closeSheet();toast('Sent. Thank you.');if(S.isOwner){S.fb.list=null;if(S.view==='feedback')loadFeedback()}}
+  catch(e){toast("That didn't send. Check your connection and try again.")}}
+async function loadFeedback(){S.fb={list:null,err:'',loading:true};render();
+  try{const rows=must(await withTimeout(sb.from('feedback').select('email,body,rating,view,created_at').order('created_at',{ascending:false}).limit(500),10000));
+    S.fb={list:rows.map(r=>({who:r.email,text:r.body,rating:r.rating,view:r.view,at:Date.parse(r.created_at)})),err:''}}
+  catch(e){S.fb={list:null,err:e&&e.code==='timeout'?'Feedback is taking longer than 10 seconds to load.':"Feedback didn't load."}}
+  if(S.view==='feedback')render()}
+function feedbackView(){const fb=S.fb;let h=`<div class="head"><h1>Feedback</h1><p class="sub">${fb.list?`${fb.list.length} entr${fb.list.length===1?'y':'ies'}, newest first · only you see this tab`:'Only you see this tab'}</p></div>`;
+  if(fb.err)return h+`<section class="empty"><h2>Not loaded</h2><p>${esc(fb.err)}</p><button class="btn small" data-act="fb-reload">Retry</button></section>`;
+  if(!fb.list)return h+`<p class="hint">Loading feedback…</p>`;
+  if(!fb.list.length)return h+`<section class="empty"><h2>No feedback yet</h2><p>Share the link with friends. Every screen has a Send feedback button, and what they write lands here.</p><button class="btn small" data-act="fb-reload">Refresh</button></section>`;
+  return h+`<div class="row"><button class="btn ghost small" data-act="fb-reload">Refresh</button></div><div>${fb.list.map(r=>{return`<div class="fbrow"><div class="meta"><b>${esc(r.who===S.email?'You':r.who||'Someone')}</b><span>${esc(LABEL[r.view]||r.view||'')}</span>${r.rating?`<span>${esc(r.rating)}/5</span>`:''}<span>${r.at?new Date(r.at).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):''}</span></div><p>${esc(r.text)}</p></div>`}).join('')}</div>`}
+
+/* ---------- sign-in ---------- */
+function authView(){return`<div class="head"><h1>Fit Check</h1><p class="sub">Your closet, your palette, outfits from what you own.</p></div>
+  <form class="card" data-form="auth" data-submit="auth-in" novalidate><h3>Sign in or create an account</h3>
+    ${F('Email','email','','type="email" autocomplete="email" required')}${F('Password, 8 characters or more','password','','type="password" autocomplete="current-password" minlength="8" required')}
+    <p class="hint" id="auth-note">${esc(S.authNote||'')}</p>
+    <div class="row"><button class="btn" type="submit">Sign in</button><button class="btn ghost" type="button" data-act="auth-up">Create account</button></div></form>
+  <p class="hint">Each account gets its own private profile, closet, inspiration and outfits.</p>`}
+async function authGo(signUp){const f=$('form[data-form=auth]');if(!f)return;const d=formData(f),email=d.email.trim(),password=d.password;
+  const note=t=>{S.authNote=t;const n=$('#auth-note');if(n)n.textContent=t};
+  if(!/^\S+@\S+\.\S+$/.test(email)){note('Enter your email address.');return}
+  if(password.length<8){note('Use a password of 8 characters or more.');return}
+  note(signUp?'Creating your account…':'Signing in…');
+  try{const r=signUp?await sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin}}):await sb.auth.signInWithPassword({email,password});
+    if(r.error){note(/invalid login/i.test(r.error.message)?"That email and password don't match. New here? Tap Create account.":/registered/i.test(r.error.message)?'That email already has an account. Tap Sign in.':r.error.message);return}
+    if(!r.data.session)note('Check your email for a confirmation link, then come back and sign in.')}
+  catch(e){note("Couldn't reach the sign-in service. Check your connection and try again.")}}
+async function onSession(ses){
+  if(ses&&ses.user){if(S.uid===ses.user.id)return;S.uid=ses.user.id;S.email=ses.user.email||'';S.authNote='';await loadAll()}
+  else{S.uid=null;S.email='';S.isOwner=false;S.profile=null;S.insights={};S.items=[];S.inspo=[];S.outfits=[];S.suggestion=null;S.pdraft=null;S.fb={list:null,err:''};last.clear();S.phase='auth';render()}}
+
+/* ---------- render and routing ---------- */
+const VIEWS={closet:closetView,outfits:outfitsView,inspo:inspoView,shop:shopView,profile:profileView,feedback:feedbackView};
+function render(){chrome();const v=$('#view');
+  if(S.phase==='boot'||S.phase==='loading'){v.innerHTML='<section class="empty"><h2>Fit Check</h2><p>Opening your closet…</p></section>';return}
+  if(S.phase==='setup'){v.innerHTML=`<section class="empty"><h2>Almost there</h2><p>${esc(S.loadErr)}</p></section>`;return}
+  if(S.phase==='auth'){v.innerHTML=authView();return}
+  if(S.phase==='error'){v.innerHTML=`<section class="empty"><h2>Not loaded yet</h2><p>${esc(S.loadErr)}</p><button class="btn" data-act="load-retry">Retry</button></section>`;return}
+  v.innerHTML=walkHTML()+VIEWS[S.view]()}
+const okView=v=>!!VIEWS[v]&&(v!=='feedback'||S.isOwner);
+function enter(){if(S.view==='feedback'&&!S.fb.list&&!S.fb.loading&&S.phase==='ready')loadFeedback()}
+function route(){const h=(location.hash||'').slice(1);S.view=okView(h)?h:(S.phase==='ready'&&!S.profile?'profile':okView(S.view)?S.view:'closet');enter()}
+function go(v){S.view=okView(v)?v:'closet';try{if(location.hash!=='#'+S.view)location.hash=S.view}catch(e){}enter();render();window.scrollTo(0,0)}
+window.addEventListener('hashchange',()=>{route();render()});
+
+const ACT={
+  go:t=>go(t.dataset.v),'auth-in':()=>authGo(false),'auth-up':()=>authGo(true),'sign-out':async()=>{try{await sb.auth.signOut()}catch(e){}},
+  'load-retry':()=>loadAll(),'sheet-close':closeSheet,'ai-stop':()=>ctl&&ctl.abort(),
+  'walk-dismiss':async()=>{S.profile={...S.profile,walkDismissed:true};render();try{await save(P.profile(),S.profile)}catch(e){}},
+  'copy-src':async()=>{const el=$('#copy-src');try{await navigator.clipboard.writeText(el.value);toast('Copied.')}catch(e){el.focus();el.select();toast('Select the text and copy it.')}},
+  'item-new':()=>openItem(blankItem(),true,'Fill in the details, then save.'),
+  'item-edit':t=>{const i=itemBy(t.dataset.id);if(i)openItem(i,false,'')},
+  'item-retag':()=>tagOpenItem(),'item-save':itemSave,
+  'item-delete':t=>{if(t.dataset.sure){const id=E.orig.item_id;S.items=S.items.filter(x=>x.item_id!==id);closeSheet();render();remove(P.item(id)).catch(()=>toast("That didn't delete. Check your connection and try again."))}else{t.dataset.sure='1';t.textContent='Tap again to delete'}},
+  'filters-clear':()=>{S.filters={category:'',palette_fit:'',season:'',formality:''};render()},
+  'csv-export':()=>saveFile('wardrobe.csv',toCSV()),
+  'csv-open':()=>openSheet(`<form data-form="csv" data-submit="csv-import" novalidate><h2>Import wardrobe.csv</h2><p class="hint">Columns, in this order on export: ${CSV_COLS.join(', ')}. Rows with an item_id you already have are updated and keep their photo.</p><div class="row">${FILE('Choose a .csv file','csv-file','accept=".csv,text/csv,text/plain"','')}</div><label class="f" for="csv-text"><span>Or paste the CSV text</span><textarea id="csv-text" name="text" rows="6" placeholder="${CSV_COLS.join(',')}"></textarea></label><div class="row"><button class="btn" type="submit">Import pasted text</button><button class="btn ghost" type="button" data-act="sheet-close">Cancel</button></div></form>`),
+  'csv-import':()=>{const t=$('#csv-text');if(t&&t.value.trim())importCSV(t.value);else toast('Paste the CSV text or choose a file.')},
+  'inspo-read':inspoRead,'taste-build':tasteBuild,
+  'inspo-open':t=>{const x=S.inspo.find(i=>i.id===t.dataset.id);if(!x)return;openSheet(`<h2>Screenshot</h2><img class="ph" style="width:200px" src="${x.photo}" alt="Inspiration screenshot">${x.analysis?AKEYS.map(k=>x.analysis[k].length?`<div><h3>${k}</h3><div class="chips" style="margin-top:6px">${x.analysis[k].map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</div></div>`:'').join(''):'<p class="hint">Not read yet.</p>'}<div class="row"><button class="btn ghost" data-act="sheet-close">Close</button><button class="btn danger" data-act="inspo-delete" data-id="${x.id}">Delete</button></div>`)},
+  'inspo-delete':t=>{if(t.dataset.sure){const id=t.dataset.id;S.inspo=S.inspo.filter(x=>x.id!==id);closeSheet();render();remove(P.inspo(id)).catch(()=>{})}else{t.dataset.sure='1';t.textContent='Tap again to delete'}},
+  occasion:t=>{S.oform.occasion=t.dataset.v;render()},
+  'outfit-build':()=>outfitBuild(false),'outfit-again':()=>outfitBuild(true),
+  'outfit-save':async()=>{const s=S.suggestion;if(!s)return;const o={id:'o'+rid(),...s,created:Date.now(),status:null};S.outfits.push(o);S.suggestion=null;render();try{await save(P.outfit(o.id),o);toast('Saved. Log it after you wear it.')}catch(e){}},
+  'outfit-log':async t=>{const o=S.outfits.find(x=>x.id===t.dataset.id);if(!o)return;const v=t.dataset.v;if(o.status===v){o.status=null;o.ratedAt=null}else{o.status=v;o.ratedAt=Date.now()}render();try{await save(P.outfit(o.id),o)}catch(e){}},
+  'outfit-delete':t=>{if(t.dataset.sure){const id=t.dataset.id;S.outfits=S.outfits.filter(x=>x.id!==id);render();remove(P.outfit(id)).catch(()=>{})}else{t.dataset.sure='1';t.textContent='Tap again'}},
+  'gaps-find':gapsFind,'profile-save':profileSave,
+  'selfie-use':()=>{const f=$('form[data-form=profile]');if(f)syncProfile(f);S.pdraft.season=S.selfie.season;S.selfie=null;render();toast('Season set. Save the profile to keep it.')},
+  'data-export':exportData,
+  'data-delete':()=>openSheet(`<h2>Delete all your data?</h2><p class="hint">This removes your profile, ${S.items.length} piece${S.items.length===1?'':'s'}, ${S.inspo.length} screenshot${S.inspo.length===1?'':'s'} and ${S.outfits.length} outfit${S.outfits.length===1?'':'s'}. It can't be undone. Feedback you already sent stays with the owner.</p><div class="row"><button class="btn danger" data-act="data-delete-yes">Delete everything</button><button class="btn ghost" data-act="sheet-close">Keep my data</button></div>`),
+  'data-delete-yes':deleteData,
+  'feedback-open':feedbackSheet,'feedback-send':feedbackSend,'fb-reload':loadFeedback,
+  'fb-rate':t=>{const cur=$('#fb-rating'),v=cur.value===t.dataset.v?'':t.dataset.v;cur.value=v;t.parentNode.querySelectorAll('button').forEach(b=>{const on=b.dataset.v===v;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)})},
+};
+const FILES={
+  'item-photo':async files=>{let url;try{url=await shrink(files[0])}catch(e){toast("That photo couldn't be opened. Try a JPEG or PNG.");return}
+    const d=blankItem();d.photo=url;const can=aiOK()&&S.ai.images&&!aiWait()&&!S.ai.busy;openItem(d,true,can?'':'Fill in the details, then save.');if(can)tagOpenItem()},
+  'item-rephoto':async files=>{if(!E)return;try{E.photo=await shrink(files[0])}catch(e){toast("That photo couldn't be opened. Try a JPEG or PNG.");return}const s=$('#item-ph');if(s)s.innerHTML=`<img class="ph" src="${E.photo}" alt="Photo of this piece">`},
+  'inspo-add':inspoAdd,selfie,
+  'csv-file':async files=>{try{importCSV(await files[0].text())}catch(e){toast("That file couldn't be read.")}},
+};
+document.addEventListener('click',e=>{if(e.target.id==='scrim'){closeSheet();return}const t=e.target.closest('[data-act]');if(!t||t.disabled)return;const fn=ACT[t.dataset.act];if(fn&&!(t.type==='submit'&&t.form)){e.preventDefault();fn(t)}});
+document.addEventListener('submit',e=>{e.preventDefault();const fn=ACT[e.target.dataset.submit];if(fn)fn(e.target)});
+document.addEventListener('change',e=>{const t=e.target;
+  if(t.matches('input[type=file][data-file]')){const files=[...t.files],k=t.dataset.file;t.value='';if(files.length&&FILES[k])FILES[k](files);return}
+  if(t.dataset.filter){S.filters[t.dataset.filter]=t.value;render();return}
+  if(t.form&&t.form.dataset.form==='profile'&&t.name==='season'){syncProfile(t.form);render()}});
+document.addEventListener('input',e=>{const t=e.target,f=t.form;if(!f||!t.name)return;
+  if(f.dataset.form==='profile')syncProfile(f);else if(f.dataset.form==='outfit')S.oform[t.name]=t.value;else if(f.dataset.form==='item'&&E)E.dirty.add(t.name)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#scrim').classList.contains('open'))closeSheet()});
+
+/* ---------- boot ---------- */
+async function boot(){
+  render();
+  let cfg=null;try{const r=await withTimeout(fetch('/api/config'),10000);cfg=r.ok?await r.json():null}catch(e){}
+  if(!cfg||!cfg.supabaseUrl||!cfg.supabaseAnonKey||!window.supabase){S.phase='setup';S.loadErr="This site isn't connected to its database yet. If you run it, set SUPABASE_URL and SUPABASE_ANON_KEY in Vercel and redeploy (see the README).";render();return}
+  sb=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);
+  sb.auth.onAuthStateChange((_e,ses)=>{setTimeout(()=>onSession(ses),0)});   /* deferred: never await Supabase calls inside this callback */
+}
+boot().catch(()=>{S.phase='error';S.loadErr='Fit Check hit a snag while starting. Retry in a moment.';render()});
+})();
+</script>
+</body>
+</html>
