@@ -9,14 +9,14 @@ const MAX_PROMPT_CHARS = 60000;
 const MAX_IMAGES = 4;
 const MAX_IMAGE_B64 = 700000; // ~525 KB decoded
 
-const fail = (res, status, code) => res.status(status).json({ code });
+const fail = (res, status, code, detail) => res.status(status).json(detail ? { code, detail: String(detail).slice(0, 200) } : { code });
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return fail(res, 405, 'method_not_allowed');
   const env = k => (process.env[k] || '').trim();
   let SUPABASE_URL = ''; try { SUPABASE_URL = new URL(env('SUPABASE_URL')).origin; } catch (e) {}   // tolerate a pasted .../rest/v1/ path
   const SUPABASE_ANON_KEY = env('SUPABASE_ANON_KEY'), SUPABASE_SERVICE_ROLE_KEY = env('SUPABASE_SERVICE_ROLE_KEY'), ANTHROPIC_API_KEY = env('ANTHROPIC_API_KEY');
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !SUPABASE_SERVICE_ROLE_KEY || !ANTHROPIC_API_KEY) return fail(res, 503, 'not_configured');
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !SUPABASE_SERVICE_ROLE_KEY || !ANTHROPIC_API_KEY) return fail(res, 503, 'not_configured', 'missing env: ' + [['SUPABASE_URL', SUPABASE_URL], ['SUPABASE_ANON_KEY', SUPABASE_ANON_KEY], ['SUPABASE_SERVICE_ROLE_KEY', SUPABASE_SERVICE_ROLE_KEY], ['ANTHROPIC_API_KEY', ANTHROPIC_API_KEY]].filter(p => !p[1]).map(p => p[0]).join(', '));
 
   // 1. Who is calling? Ask Supabase to validate the token rather than trusting it.
   const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
@@ -52,7 +52,7 @@ module.exports = async (req, res) => {
       headers: { apikey: SUPABASE_SERVICE_ROLE_KEY, authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`, 'content-type': 'application/json' },
       body: JSON.stringify({ p_user: user.id, p_cap: DAILY_CAP }),
     });
-    if (!r.ok) return fail(res, 503, 'not_configured');
+    if (!r.ok) { console.error('bump_ai_usage', r.status, (await r.text()).slice(0, 300)); return fail(res, 503, 'not_configured', `usage counter ${r.status}: run supabase/schema.sql and check SUPABASE_SERVICE_ROLE_KEY`); }
     if ((await r.json()) !== true) return fail(res, 429, 'daily_limit');
   } catch (e) { return fail(res, 502, 'upstream_error'); }
 
@@ -63,13 +63,17 @@ module.exports = async (req, res) => {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-      body: JSON.stringify({ model, max_tokens: 2000, messages: [{ role: 'user', content }] }),
+      body: JSON.stringify({ model, max_tokens: 4000, messages: [{ role: 'user', content }] }),
     });
     if (r.status === 429 || r.status === 529) return fail(res, 429, 'rate_limited');
-    if (!r.ok) { console.error('anthropic', r.status, (await r.text()).slice(0, 300)); return fail(res, 502, 'upstream_error'); }
+    if (!r.ok) {
+      const raw = (await r.text()).slice(0, 400); console.error('anthropic', r.status, model, raw);
+      let why = ''; try { const j = JSON.parse(raw); why = (j.error && (j.error.message || j.error.type)) || ''; } catch (e) {}
+      return fail(res, 502, 'upstream_error', `Anthropic ${r.status}${why ? ': ' + why : ''}`);   // no secrets in these messages
+    }
     const out = await r.json();
     const text = (out.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
-    if (!text.trim()) return fail(res, 502, 'upstream_error');
-    return res.status(200).json({ text });
+    if (!text.trim()) return fail(res, 502, 'upstream_error', 'Claude returned no text');
+    return res.status(200).json({ text, truncated: out.stop_reason === 'max_tokens' });
   } catch (e) { console.error('claude call failed', e && e.message); return fail(res, 502, 'upstream_error'); }
 };

@@ -280,13 +280,15 @@ async function ask(label,prompt,{images,tier='default'}={}){
     const ses=(await sb.auth.getSession()).data.session;if(!ses)throw{code:'session_expired'};
     const r=await fetch('/api/claude',{method:'POST',signal:ctl.signal,headers:{'content-type':'application/json',authorization:'Bearer '+ses.access_token},body:JSON.stringify({prompt,tier,images:images||[]})});
     const body=await r.json().catch(()=>({}));
-    if(!r.ok)throw{code:body.code||'upstream_error'};
-    const v=salvage(body.text);if(v===undefined)throw{code:'invalid_json'};
+    if(!r.ok)throw{code:body.code||'upstream_error',detail:body.detail||('HTTP '+r.status+(r.status===504?' (the server function timed out)':''))};
+    const v=salvage(body.text);if(v===undefined)throw{code:body.truncated?'truncated':'invalid_json'};
     return v}
   catch(e){const c=e&&e.name==='AbortError'?'cancelled':(e&&e.code)||'upstream_error',err={code:c,handled:false};
     const say=m=>{toast(m);err.handled=true};
     if(c==='not_allowed'){S.ai.off=true;say("AI features aren't enabled for your account. Everything still works by hand.")}
-    else if(c==='not_configured'){S.ai.off=true;say("AI isn't set up on this site yet. Everything still works by hand.")}
+    else if(c==='not_configured'){S.ai.off=true;say("AI isn't set up on this site yet"+(e.detail?' ('+e.detail+')':'')+'. Everything still works by hand.')}
+    else if(c==='upstream_error')say('The AI call failed: '+(e.detail||'no response from the server')+'.');
+    else if(c==='truncated')say("Claude's reply was cut off before it finished. Try again.");
     else if(c==='daily_limit')say("You've used today's AI calls. They reset at midnight UTC.");
     else if(c==='rate_limited'){S.ai.cool=Date.now()+90000;setTimeout(render,90500);say('Claude is rate-limited right now. The AI buttons come back in 90 seconds.')}
     else if(c==='session_expired')say('Your session expired. Sign in again, then retry.');
