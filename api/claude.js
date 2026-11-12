@@ -13,7 +13,9 @@ const fail = (res, status, code) => res.status(status).json({ code });
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return fail(res, 405, 'method_not_allowed');
-  const { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, ANTHROPIC_API_KEY } = process.env;
+  const env = k => (process.env[k] || '').trim();
+  let SUPABASE_URL = ''; try { SUPABASE_URL = new URL(env('SUPABASE_URL')).origin; } catch (e) {}   // tolerate a pasted .../rest/v1/ path
+  const SUPABASE_ANON_KEY = env('SUPABASE_ANON_KEY'), SUPABASE_SERVICE_ROLE_KEY = env('SUPABASE_SERVICE_ROLE_KEY'), ANTHROPIC_API_KEY = env('ANTHROPIC_API_KEY');
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !SUPABASE_SERVICE_ROLE_KEY || !ANTHROPIC_API_KEY) return fail(res, 503, 'not_configured');
 
   // 1. Who is calling? Ask Supabase to validate the token rather than trusting it.
