@@ -36,6 +36,18 @@ Static front end (`index.html`), two Vercel functions (`api/`), Supabase for sig
 - `api/claude.js`: validates the caller's Supabase token, enforces the allowlist and daily cap
   (`ai_usage` + `bump_ai_usage`), then calls the Anthropic Messages API. Prompts are built in the browser.
 - `api/config.js`: hands the browser the public Supabase URL and anon key from env.
+- `api/product.js`: for the buy-check, reads a product page's public title, description, price and main image.
+  Signed-in users only; https only, public addresses only, redirects re-checked, size and time capped.
+
+## Features beyond the basics
+
+- **Buy-check** (Shop tab): product link and/or screenshot in, verdict out: palette fit, owned duplicates,
+  outfits unlocked, budget. Many large retailers block server-side page reads; a screenshot always works.
+- **Inspiration to closet** (Inspo tab, tap a look): the closest version from owned pieces plus the one missing
+  piece, which also feeds the gap analysis.
+- **Fit photo as wear log** (Outfits tab): a mirror photo is rated, visible pieces are matched to the closet and
+  confirmed by the user, and unknown pieces can be added. Wears drive cost per wear (needs a price on the piece)
+  and the "unworn 90+ days" flag in the Closet. Docs live at `wears/<id>`; no schema change.
 
 ## Known limits
 
@@ -43,4 +55,4 @@ Static front end (`index.html`), two Vercel functions (`api/`), Supabase for sig
   size caps and `ALLOWED_EMAILS` bound the cost; set `ALLOWED_EMAILS` before sharing the link widely.
 - Anyone with the URL can create an account and store data. For a wider launch add a per-user row limit.
 - As database admin you can read every row from the Supabase dashboard. Tell your friends.
-- CSV import/export columns: `item_id,name,category,subcategory,primary_color,secondary_color,palette_fit,material,formality,season,brand,size,notes`.
+- CSV import/export columns: `item_id,name,category,subcategory,primary_color,secondary_color,palette_fit,material,formality,season,brand,size,notes,price`.
