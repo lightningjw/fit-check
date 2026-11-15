@@ -49,6 +49,15 @@ Static front end (`index.html`), two Vercel functions (`api/`), Supabase for sig
   confirmed by the user, and unknown pieces can be added. Wears drive cost per wear (needs a price on the piece)
   and the "unworn 90+ days" flag in the Closet. Docs live at `wears/<id>`; no schema change.
 
+## Design
+
+- Editorial lookbook: Bodoni Moda for display, Hanken Grotesk for interface text, flat surfaces, 1px hairlines, 2px corners.
+- Colors come from the user's color season. `profile.season` sets `data-season` on `<html>`, which switches one of 13
+  token sets (`bg, surface, ink, muted, line, accent, accent-ink, metal, tag, stroke`) defined at the top of the stylesheet.
+- `node scripts/check-contrast.mjs` reads those tokens out of `index.html` and fails if any theme misses WCAG AA.
+- Motion is CSS, the Web Animations API and the View Transitions API; there are no animation dependencies. Everything
+  respects `prefers-reduced-motion`, and nothing animates in the add-piece flow or on keyboard-triggered actions.
+
 ## Known limits
 
 - Prompts come from the client, so a signed-in user could send their own prompt through your key. The daily cap,
