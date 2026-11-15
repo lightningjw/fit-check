@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Fit Check</title>
+<meta name="theme-color" content="#F4F3F1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,11 +13,9 @@
   /* Editorial lookbook: flat surfaces, 1px hairlines, 2px corners. Colors come from the wearer's color season. */
   --display:"Bodoni Moda","Didot","Bodoni MT",Georgia,serif;
   --body:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif;
-  --ease-out:cubic-bezier(.23,1,.32,1);
+  --ease-out:cubic-bezier(.23,1,.32,1); --ease-in-out:cubic-bezier(.77,0,.175,1); --ease-drawer:cubic-bezier(.32,.72,0,1);
   --ok:#2F6B4F; --warn:#8A5D0C; --bad:#A1362B;
   --tabs-h:68px;
-  /* pre-redesign names, still read by screens not yet restyled; removed in phase 2 */
-  --paper:var(--bg); --card:var(--surface); --mute:var(--muted); --wash:var(--line);
   color-scheme:light;
 }
 /* Season themes, switched by data-season on <html>. Every pair is checked by scripts/check-contrast.mjs. */
@@ -36,6 +35,9 @@
 
 *{box-sizing:border-box}
 html,body{margin:0}
+html{-webkit-tap-highlight-color:transparent}
+button,a,label.btn,.fab,summary{touch-action:manipulation}
+button,label.btn,.fab,summary{user-select:none;-webkit-user-select:none}
 body{background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--body);padding-bottom:calc(var(--tabs-h) + 88px + env(safe-area-inset-bottom));-webkit-text-size-adjust:100%;caret-color:var(--accent)}
 ::selection{background:var(--accent);color:var(--accent-ink)}
 img{max-width:100%}
@@ -78,7 +80,8 @@ main{max-width:720px;margin:0 auto;padding:0 20px}
 label.btn:focus-within,.fab:focus-within{outline:2px solid var(--ink);outline-offset:2px}
 .lnk{appearance:none;background:none;border:0;padding:0;min-height:44px;font:500 13px/1 var(--body);color:var(--muted);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .acts{display:flex;flex-wrap:wrap;gap:0 20px}
-.f{display:flex;flex-direction:column;gap:4px;font:600 11px/1.3 var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--muted);flex:1 1 150px;min-width:0}
+.f{display:flex;flex-direction:column;gap:4px;font:600 11px/1.3 var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--muted);min-width:0}
+.grid2>.f,.row>.f{flex:1 1 150px}
 .f input,.f select,.f textarea,.plain{font:400 16px/1.35 var(--body);letter-spacing:0;text-transform:none;color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--muted);border-radius:0;padding:8px 0;width:100%;accent-color:var(--accent)}
 .f input:focus-visible,.f select:focus-visible,.f textarea:focus-visible{outline:0;border-bottom:2px solid var(--ink);padding-bottom:7px}
 .f textarea{resize:vertical;min-height:64px}
@@ -106,7 +109,7 @@ label.btn:focus-within,.fab:focus-within{outline:2px solid var(--ink);outline-of
 .sw i{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);display:block}
 .pal .avoid i{position:relative;opacity:.85}
 .pal .avoid i::after{content:"";position:absolute;left:-2px;right:-2px;top:50%;height:2px;background:var(--surface);transform:rotate(-45deg)}
-.pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:99px;padding:3px 8px 3px 6px;white-space:nowrap}
+.pill{display:inline-flex;align-items:center;gap:6px;font:600 10.5px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);padding:3px 8px 3px 6px;white-space:nowrap}
 .pill i{width:9px;height:9px;border-radius:50%;background:var(--muted)}
 .pill.off{border-style:dashed;color:var(--bad);border-color:var(--bad)}
 .pill.off i{background:transparent;border:1.5px solid var(--bad)}
@@ -147,26 +150,21 @@ label.btn:focus-within,.fab:focus-within{outline:2px solid var(--ink);outline-of
 .fab:active{transform:scale(.97)}
 .fab svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 
-/* inspo grid, restyled in phase 2 */
-.item{appearance:none;text-align:left;font:inherit;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:2px;padding:0;cursor:pointer;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.item .im{aspect-ratio:3/4;background:var(--line);display:block;width:100%;object-fit:cover}
-.item .tx{padding:9px 10px 11px;display:flex;flex-direction:column;gap:5px;min-width:0}
-.item b{font-weight:600;font-size:14px;line-height:1.25;overflow-wrap:anywhere}
-.item small{color:var(--muted);font-size:12px;overflow-wrap:anywhere}
 .chips{display:flex;flex-wrap:wrap;gap:5px}
 .chip{font-size:12px;border:1px solid var(--line);border-radius:2px;padding:2px 7px;color:var(--muted)}
 
-/* flat-lay */
-.lay{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:50px;grid-auto-flow:dense;gap:9px;padding:16px;background:var(--line);border-radius:2px}
-.t{position:relative;overflow:hidden;border-radius:2px;background:var(--surface);box-shadow:0 10px 18px -12px rgba(0,0,0,.5);grid-column:span 2;grid-row:span 2}
-.t:nth-child(odd){transform:rotate(-1.1deg)}.t:nth-child(even){transform:rotate(.8deg)}
+/* flat-lay canvas: pieces sit slightly askew on a flat surface; a swap crossfades one slot */
+.lay{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:50px;grid-auto-flow:dense;gap:9px;padding:16px;background:var(--surface);border:1px solid var(--line)}
+.t{position:relative;overflow:hidden;background:var(--bg);box-shadow:0 8px 14px -10px rgba(0,0,0,.4);grid-column:span 2;grid-row:span 2;transform:rotate(var(--r,0deg))}
+.t .a,.t .b{position:absolute;inset:0;transition:opacity .2s ease}
+.t .b{opacity:0}.t.sw .a{opacity:0}.t.sw .b{opacity:1}
 .t img,.t .blk{width:100%;height:100%;object-fit:cover;display:block}
-.t span{position:absolute;left:0;right:0;bottom:0;font-size:11px;line-height:1.25;padding:4px 6px;background:var(--surface);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t em{position:absolute;left:0;right:0;bottom:0;font:400 11px/1.25 var(--body);padding:4px 6px;background:var(--surface);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .t.outerwear,.t.bottom{grid-column:span 3;grid-row:span 4}
 .t.top,.t.one-piece{grid-column:span 3;grid-row:span 3}
 .t.shoes{grid-column:span 3;grid-row:span 2}
-.outfit .why{font:italic 400 19px/1.35 var(--display)}
-.kv{font-size:14px}.kv b{font-weight:600}
+.why{font:italic 400 19px/1.35 var(--display)}
+.kv{font-size:14px}.kv b{font-weight:600}.kv .lnk{min-height:0;padding:12px 0;margin-left:8px}
 
 /* taste */
 .pat{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 0;border-top:1px solid var(--line);align-items:center}
@@ -177,20 +175,30 @@ label.btn:focus-within,.fab:focus-within{outline:2px solid var(--ink);outline-of
 
 /* tabs */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-nav.tabs div{max-width:720px;height:var(--tabs-h);margin:0 auto;display:flex}
+nav.tabs .tw{position:relative;max-width:720px;margin:0 auto}
+#tabs{display:flex;height:var(--tabs-h)}
+#tabline{position:absolute;top:-1px;left:0;height:2px;display:flex;justify-content:center;pointer-events:none;transition:transform .22s var(--ease-out)}
+#tabline[hidden]{display:none}
+#tabline.still{transition:none}
+#tabline b{width:48%;background:var(--accent)}
 nav.tabs button{position:relative;flex:1;appearance:none;background:none;border:0;color:var(--muted);font:400 11px/1 var(--body);padding:0 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;min-width:0;-webkit-tap-highlight-color:transparent}
 nav.tabs button[aria-current="page"]{color:var(--ink);font-weight:600}
-nav.tabs button[aria-current="page"]::before{content:"";position:absolute;top:-1px;left:26%;right:26%;height:2px;background:var(--accent)}
 nav.tabs button:focus-visible{outline-offset:-4px}
 nav.tabs svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 
 /* sheet, busy, toast */
-#scrim{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center}
-#scrim.open{display:flex}
-#sheet{background:var(--bg);width:100%;max-width:560px;max-height:92%;overflow:auto;border-radius:2px 2px 0 0;padding:20px 20px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
+#scrim{position:fixed;inset:0;z-index:40;display:flex;align-items:flex-end;justify-content:center;visibility:hidden;transition:visibility 0s .25s}
+#scrim.open{visibility:visible;transition:none}
+#shade{position:absolute;inset:0;background:rgba(0,0,0,.5);opacity:0;transition:opacity .25s ease}
+#scrim.open #shade{opacity:1}
+#sheet{position:relative;background:var(--bg);width:100%;max-width:560px;max-height:92dvh;overflow:auto;overscroll-behavior:contain;border-radius:2px 2px 0 0;padding:0 20px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px;transform:translateY(100%);transition:transform .25s var(--ease-out)}
+#scrim.open #sheet{transform:none;transition:transform .5s var(--ease-drawer)}
+#scrim.instant,#scrim.instant #shade,#scrim.instant #sheet{transition:none}
+.grab{position:sticky;top:0;z-index:2;flex:none;height:28px;margin:0 -20px -8px;background:var(--bg);touch-action:none;cursor:grab;display:flex;align-items:center;justify-content:center}
+.grab::before{content:"";width:36px;height:3px;background:color-mix(in srgb,var(--ink) 28%,transparent)}
 #sheet form{display:flex;flex-direction:column;gap:14px}
-#sheet .ph{width:140px;aspect-ratio:3/4;object-fit:cover;border-radius:0;border:1px solid var(--line)}
-@media(min-width:600px){#scrim{align-items:center}#sheet{border-radius:2px}}
+#sheet .ph{width:140px;aspect-ratio:3/4;object-fit:cover;border:1px solid var(--line);display:block}
+@media(min-width:600px){#scrim{align-items:center}#sheet{border-radius:2px;padding-top:20px;transform:translateY(12px);opacity:0;transition:transform .2s var(--ease-out),opacity .2s ease}#scrim.open #sheet{opacity:1;transition:transform .25s var(--ease-out),opacity .25s ease}.grab{display:none}}
 #busy{position:fixed;left:0;right:0;bottom:calc(var(--tabs-h) + 8px + env(safe-area-inset-bottom));z-index:35;display:none;justify-content:center;padding:0 20px;pointer-events:none}
 #busy.open{display:flex}
 #busy div{pointer-events:auto;background:var(--ink);color:var(--bg);border-radius:2px;padding:10px 12px;display:flex;gap:12px;align-items:center;font-size:14px;max-width:560px;width:100%}
@@ -198,23 +206,112 @@ nav.tabs svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1
 #busy button{appearance:none;background:none;border:1px solid currentColor;color:inherit;font:600 12px var(--body);padding:6px 10px;border-radius:2px;cursor:pointer}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--bg);animation:pulse 1.1s ease-in-out infinite;flex:none}
 @keyframes pulse{50%{opacity:.25}}
-#toast{position:fixed;left:20px;right:20px;top:16px;z-index:50;display:none;justify-content:center;pointer-events:none}
-#toast.open{display:flex}
-#toast p{background:var(--surface);border:1px solid var(--ink);padding:10px 14px;border-radius:2px;font-size:14px;max-width:520px;box-shadow:0 12px 24px -14px rgba(0,0,0,.5)}
+#toast{position:fixed;left:20px;right:20px;top:calc(12px + env(safe-area-inset-top));z-index:50;display:flex;justify-content:center;pointer-events:none;visibility:hidden;opacity:0;transform:translateY(-8px);transition:opacity .2s ease,transform .2s ease,visibility 0s .2s}
+#toast.open{visibility:visible;opacity:1;transform:none;transition:opacity .4s ease,transform .4s ease}
+#toast p{background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:2px;font-size:13.5px;max-width:520px}
 .stars{display:flex;gap:6px}
 .pill.warn{color:var(--warn);border-color:var(--warn)}.pill.warn i{background:var(--warn)}
-.cks{display:flex;flex-direction:column;gap:2px}.cks.scroll{max-height:230px;overflow:auto;border:1px solid var(--line);border-radius:2px;padding:4px 10px;background:var(--surface)}
+.cks{display:flex;flex-direction:column;gap:2px}.cks.spot{flex-direction:row;flex-wrap:wrap;gap:8px;margin-top:8px}.spot .ck{border:1px solid var(--line);background:var(--surface);padding:6px 12px 6px 8px;font-size:14px}.cks.scroll{max-height:230px;overflow:auto;border:1px solid var(--line);border-radius:2px;padding:4px 10px;background:var(--surface)}
 .ck{display:flex;align-items:center;gap:10px;font-size:15px;padding:6px 0;cursor:pointer}.ck input{width:20px;height:20px;flex:none;accent-color:var(--accent)}
 .mini{width:36px;height:48px;object-fit:cover;border-radius:0;display:block;flex:none;background:var(--line);border:1px solid var(--line)}.mini.big{width:72px;height:96px}
-.stamp{font:italic 600 30px/1 var(--display)}.stamp.good{color:var(--ok)}.stamp.adapt{color:var(--warn)}.stamp.off{color:var(--bad)}
 details summary{cursor:pointer;font-size:14px;padding:6px 0;color:var(--muted)}
 .fbrow{border-top:1px solid var(--line);padding:12px 0;display:flex;flex-direction:column;gap:4px}
 .fbrow .meta{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
 .fbrow p{white-space:pre-wrap;overflow-wrap:anywhere}
+
+/* hang tag: paper tag with notched top corners, a metal grommet, and a string up to a pin */
+.hang{position:relative;display:flex;flex-direction:column;align-items:center;width:136px;flex:none;filter:drop-shadow(0 3px 5px rgba(0,0,0,.14))}
+.hang .pin{width:9px;height:9px;border-radius:50%;background:var(--metal)}
+.hang .sw{display:flex;flex-direction:column;align-items:center;transform-origin:50% 0}
+.hang .str{width:1px;height:30px;background:var(--metal)}
+.hang .paper{position:relative;width:136px;min-height:172px;padding:26px 10px 14px;background:var(--tag);clip-path:polygon(20% 0,80% 0,100% 13%,100% 100%,0 100%,0 13%);display:flex;flex-direction:column;align-items:center;text-align:center}
+.hang .gr{position:absolute;top:9px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;border:2.5px solid var(--metal);background:var(--bg)}
+.hang .lb{font:600 9.5px/1.3 var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.hang .word{display:inline-block;margin-top:6px;padding:0 7px;border:2px solid var(--accent);font:600 30px/1.2 var(--display);color:var(--accent);transform:rotate(-7deg)}
+.hang .rule{width:70%;height:1px;margin:14px 0 8px;background:var(--line)}
+.hang .l1{font-size:11px;font-weight:600;font-variant-numeric:tabular-nums}
+.hang .l2{font-size:11px;margin-top:2px;color:var(--muted)}
+.hang.sm,.hang.sm .paper{width:96px}
+.hang.sm .paper{min-height:0;padding:24px 8px 12px}
+.hang.sm .str{height:18px}
+.hang.sm .word{border:0;padding:0;margin-top:2px;font-size:34px;line-height:1.1;transform:none}
+.hang.sm .l2{margin-top:0}
+
+/* buy-check verdict */
+.vd{display:flex;flex-direction:column;gap:12px}
+.verdict{position:relative;margin-top:26px;min-height:250px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;justify-content:flex-end}
+.verdict .pic{position:absolute;left:0;top:0;bottom:60px;width:56%;padding:14px 0 0 16px}
+.verdict .pic img{width:100%;height:100%;object-fit:cover;display:block}
+.verdict .cap{position:relative;display:flex;flex-direction:column;gap:2px;padding:0 16px 14px;max-width:58%}
+.verdict .cap b{font-size:15px;font-weight:500;line-height:1.25}
+.verdict .cap small{font-size:12px;color:var(--muted)}
+.verdict .hang{position:absolute;top:-18px;right:16px}
+.whyh{font-style:italic;font-size:22px;margin-top:8px}
+.rows{display:flex;flex-direction:column;border-bottom:1px solid var(--line)}
+.rw{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px;line-height:1.4}
+.rw .n{flex:none;width:12px;font:400 15px/1.3 var(--display);color:var(--accent)}
+.rw .bd{display:flex;flex-direction:column;gap:6px;min-width:0}
+
+/* inspiration to closet */
+.look{position:relative;background:var(--line)}
+.look img{display:block;width:100%;max-height:230px;object-fit:cover}
+.mrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.mrow .slot{flex:none;width:76px;font:600 10px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);overflow-wrap:anywhere}
+.mrow .ar{flex:none;width:14px;height:14px;fill:none;stroke:var(--muted);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mrow .bd{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.mrow .bd b{font-size:14px;font-weight:500;overflow-wrap:anywhere}
+.mrow .bd small{font-size:12px;color:var(--muted)}
+.lab{flex:none;padding:3px 8px;font:600 10.5px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;border:1px solid currentColor;white-space:nowrap}
+.lab.match{color:var(--ok)}.lab.close{color:var(--muted)}.lab.missing{color:var(--accent)}
+.ghostbox{flex:none;width:36px;height:48px;border:1.5px dashed var(--accent);display:flex;align-items:center;justify-content:center}
+.ghostbox svg{width:26px;fill:none;stroke:var(--accent);stroke-width:4;stroke-dasharray:7 6;stroke-linejoin:round}
+
+/* fit photo and wear log */
+.fitshot{display:flex;gap:20px;align-items:flex-start}
+.shot{position:relative;overflow:hidden;width:150px;flex:none;border:1px solid var(--line)}
+.shot img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover}
+.shot .scan{position:absolute;inset:0;border-top:2px solid var(--accent);opacity:0}
+.logph{position:relative;flex:none}
+.logph .tag{top:6px;right:-8px}
+.rolls{display:flex;flex-direction:column;gap:2px;font-size:13px;font-variant-numeric:tabular-nums}
+.rolls b{font-weight:600}
+
+/* season picker */
+.seasons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.seasons button{appearance:none;border:0;background:var(--surface);padding:12px 4px 10px;min-height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font:500 12px/1.2 var(--body);color:var(--muted);cursor:pointer}
+.seasons button[aria-pressed="true"]{color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--accent)}
+.seasons button:focus-visible{outline-offset:-3px}
+.seasons .swatches{padding:0}
+.seasons .swatches i{width:18px;height:18px;border-color:var(--surface)}
+
+/* motion. One-shot entrances are keyframes gated by .play; anything a user can retrigger is a transition. */
+@keyframes hang-drop{0%{transform:translateY(-70px) rotate(-32deg);opacity:0;animation-timing-function:cubic-bezier(.3,.7,.4,1)}20%{opacity:1}45%{transform:translateY(0) rotate(13deg)}64%{transform:rotate(-6deg)}82%{transform:rotate(2.5deg)}100%{transform:rotate(0)}}
+@keyframes stamp{0%{transform:scale(1.9) rotate(-7deg);opacity:0}100%{transform:scale(1) rotate(-7deg);opacity:1}}
+@keyframes rise{from{transform:translateY(10px);opacity:0}}
+@keyframes slide-in{from{transform:translateX(18px);opacity:0}}
+@keyframes ghost{50%{opacity:.4}}
+@keyframes settle{from{opacity:0;transform:translateY(-14px) rotate(calc(var(--r,0deg) - 3deg)) scale(1.05)}}
+@keyframes pop{from{opacity:0;transform:scale(.9)}}
+@keyframes scan{0%{transform:translateY(0);opacity:0}12%,88%{opacity:1}100%{transform:translateY(100%);opacity:0}}
+@keyframes fan{from{transform:translateX(var(--x))}}
+.play .hang .sw{animation:hang-drop 1.25s cubic-bezier(.37,0,.63,1) both}
+.play .hang .word{animation:stamp .34s cubic-bezier(.2,.9,.3,1.25) .72s both}
+.play .rise{animation:rise .45s var(--ease-out) both;animation-delay:calc(.9s + var(--i)*.1s)}
+.slide{animation:slide-in .5s var(--ease-out) both;animation-delay:calc(.25s + var(--i)*.18s)}
+.ghost{animation:ghost 1.2s ease-in-out 1.4s 2}
+.lay.play .t{animation:settle .42s var(--ease-out) both;animation-delay:var(--d)}
+.play .shot .scan{animation:scan .9s cubic-bezier(.37,0,.63,1) .15s both}
+.play .spot .ck{animation:pop .3s var(--ease-out) both;animation-delay:calc(.85s + var(--d))}
+.swatches.fan i{animation:fan .5s var(--ease-out) both;animation-delay:var(--d)}
+/* shared-element morph (closet photo to detail) and the season re-dye */
+::view-transition-group(piece){animation-duration:.3s;animation-timing-function:cubic-bezier(.77,0,.175,1)}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.25s}
+html.redye::view-transition-old(root),html.redye::view-transition-new(root){animation:none;mix-blend-mode:normal}
+html.dye,html.dye *,html.dye *::before,html.dye *::after{transition:background-color .6s ease,color .6s ease,border-color .6s ease,box-shadow .6s ease!important}
 @media(hover:hover) and (pointer:fine){.lnk:hover,.ftabs button:hover,nav.tabs button:hover,.refine summary:hover{color:var(--ink)}.piece:hover .fr{border-color:var(--muted)}}
 @media(max-width:480px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:360px){h1{font-size:40px}}
-@media(prefers-reduced-motion:reduce){.dot{animation:none}.t{transform:none!important}.btn,.fab,.piece{transition:none}.btn:active,.fab:active,.piece:active{transform:none}}
+@media(prefers-reduced-motion:reduce){.dot,.play .hang .sw,.play .hang .word,.play .rise,.slide,.ghost,.lay.play .t,.play .shot .scan,.play .spot .ck,.swatches.fan i{animation:none}.btn,.fab,.piece,#tabline,#scrim,#shade,#sheet,#toast{transition:none!important}.btn:active,.fab:active,.piece:active{transform:none}::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 </head>
@@ -229,9 +326,9 @@ details summary{cursor:pointer;font-size:14px;padding:6px 0;color:var(--muted)}
   <p id="notice" role="status"></p>
   <div id="view"><section class="empty"><h2>Fit Check</h2><p>Opening your closet…</p></section></div>
 </main>
-<nav class="tabs" aria-label="Sections"><div id="tabs"></div></nav>
+<nav class="tabs" aria-label="Sections"><div class="tw"><i id="tabline" hidden><b></b></i><div id="tabs"></div></div></nav>
 <div id="busy" role="status"><div><i class="dot"></i><b id="busy-l"></b><span id="busy-d"></span><button data-act="ai-stop" id="busy-stop">Stop</button></div></div>
-<div id="scrim"><div id="sheet" role="dialog" aria-modal="true"></div></div>
+<div id="scrim"><div id="shade"></div><div id="sheet" role="dialog" aria-modal="true"></div></div>
 <div id="toast" role="status" aria-live="polite"><p id="toast-p"></p></div>
 
 <script>
@@ -414,9 +511,41 @@ No brand names, prices, sizes or punctuation in either query.
 Schema: {"gaps": [{"gap": short name of what is missing, "search_query": string, "search_broad": string, "piece": {"item": string such as "chore jacket", "color": string, "cut": string, "fabric": string, "price_low": integer, "price_high": integer}, "unlocks": integer, "pairs_with": [item_id, ... up to 6], "why": one sentence on why it suits the user's palette and build}]} with exactly 5 gaps, best first.`}
 
 /* ---------- small UI helpers ---------- */
+const reduce=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* FX: one-shot entrances. A caller adds a key right before render(); the view adds .play for that render only. */
+const FX=new Set(),fx=k=>FX.has(k);
+let kbLast=false,ROLL=null,fanned=false;   /* kbLast: the last input was the keyboard, so nothing animates */
+const stag=n=>[0,50,90,120,145,165,180,190][Math.min(n,7)];
+function tween(el,from,to,fmt,delay,dur){if(reduce()||from===to)return;el.textContent=fmt(from);const t0=performance.now()+delay;
+  (function f(now){if(!el.isConnected)return;const p=Math.min(1,Math.max(0,(now-t0)/dur));el.textContent=fmt(from+(to-from)*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)})(performance.now())}
 let toastT;function toast(m){$('#toast-p').textContent=m;$('#toast').classList.add('open');clearTimeout(toastT);toastT=setTimeout(()=>$('#toast').classList.remove('open'),4200)}
-function openSheet(html){$('#sheet').innerHTML=html;$('#scrim').classList.add('open');const f=$('#sheet input:not([type=file]),#sheet textarea,#sheet button');if(f&&window.matchMedia('(min-width:600px)').matches)f.focus()}
-function closeSheet(){$('#scrim').classList.remove('open');$('#sheet').innerHTML='';E=null}
+let sheetT;
+function openSheet(html,instant){clearTimeout(sheetT);const sc=$('#scrim'),sh=$('#sheet');sh.style.transform='';$('#shade').style.opacity='';sh.inert=false;
+  sh.innerHTML='<div class="grab" aria-hidden="true"></div>'+html;sh.scrollTop=0;sc.classList.toggle('instant',!!instant||kbLast||reduce());sc.classList.add('open');
+  const f=$('#sheet input:not([type=file]):not([type=hidden]),#sheet textarea,#sheet button');if(f&&window.matchMedia('(min-width:600px)').matches)f.focus()}
+function closeSheet(instant){const sc=$('#scrim'),sh=$('#sheet');E=null;clearTimeout(sheetT);sh.style.transform='';sh.style.transition='';$('#shade').style.opacity='';$('#shade').style.transition='';sh.inert=true;
+  if(instant||kbLast||reduce()){sc.classList.add('instant');sc.classList.remove('open');sh.innerHTML='';return}
+  sc.classList.remove('instant','open');sheetT=setTimeout(()=>{sh.innerHTML=''},280)}
+/* Closet photo <-> detail photo: a shared-element morph. Editing only; adding a piece never animates. */
+const canMorph=()=>!!document.startViewTransition&&!reduce()&&!kbLast;
+function morphOpen(card,item){const img=card&&card.querySelector('.fr img');if(!img||!canMorph()){openItem(item,false,'');return}
+  img.style.viewTransitionName='piece';
+  document.startViewTransition(()=>{img.style.viewTransitionName='';openItem(item,false,'',true);const ph=$('#sheet .ph');if(ph)ph.style.viewTransitionName='piece'})}
+function dismissSheet(dragged){const e=E;if(!e||e.isNew===undefined){closeSheet();return}
+  if(e.isNew){closeSheet(true);return}
+  const ph=$('#sheet .ph'),card=document.querySelector(`.piece[data-id="${CSS.escape(e.orig.item_id)}"] .fr img`);
+  if(dragged||!ph||!card||!canMorph()){closeSheet();return}
+  ph.style.viewTransitionName='piece';
+  document.startViewTransition(()=>{closeSheet(true);card.style.viewTransitionName='piece'}).finished.finally(()=>{card.style.viewTransitionName=''})}
+/* Season re-dye: the new palette spreads from the tap point. Without View Transitions (or with reduced motion) the tokens crossfade. */
+let dyeT,dyeN=0;
+function redye(x,y,apply){const root=document.documentElement;
+  if(kbLast){apply();return}
+  if(reduce()||!document.startViewTransition){root.classList.add('dye');apply();clearTimeout(dyeT);dyeT=setTimeout(()=>root.classList.remove('dye'),650);return}
+  dyeN++;root.classList.add('redye');const r=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y)),vt=document.startViewTransition(apply);
+  vt.ready.then(()=>root.animate({clipPath:[`circle(0px at ${x}px ${y}px)`,`circle(${r}px at ${x}px ${y}px)`]},{duration:600,easing:'cubic-bezier(.77,0,.175,1)',pseudoElement:'::view-transition-new(root)'})).catch(()=>{});
+  vt.finished.finally(()=>{if(!--dyeN)root.classList.remove('redye')})}
+function hangTag({label,word,l1,l2,sm}){return`<div class="hang ${sm?'sm':''}"><i class="pin"></i><div class="sw"><i class="str"></i><div class="paper"><i class="gr"></i><span class="lb">${label}</span><span class="word">${esc(word)}</span>${l1?`<i class="rule"></i><span class="l1">${l1}</span>`:''}${l2?`<span class="l2">${l2}</span>`:''}</div></div></div>`}
 const F=(label,name,val,attr='')=>`<label class="f" for="f-${name}"><span>${label}</span><input id="f-${name}" name="${name}" value="${esc(val)}" ${attr}></label>`;
 const TA=(label,name,val,ph='')=>`<label class="f" for="f-${name}"><span>${label}</span><textarea id="f-${name}" name="${name}" placeholder="${esc(ph)}">${esc(val)}</textarea></label>`;
 const SEL=(label,name,val,opts,attr='')=>`<label class="f" for="f-${name}"><span>${label}</span><select id="f-${name}" name="${name}" ${attr}>${opts.map(o=>{const[v,t]=Array.isArray(o)?o:[o,o];return`<option value="${esc(v)}" ${String(v)===String(val??'')?'selected':''}>${esc(t)}</option>`}).join('')}</select></label>`;
@@ -439,11 +568,15 @@ const tabList=()=>['closet','outfits','inspo','shop','profile'].concat(S.isOwner
 /* Theme key for data-season: "Deep Autumn" -> "deep-autumn"; "none" until a season is set. The Profile screen previews its draft. */
 const seasonKey=()=>{const s=(S.view==='profile'&&S.pdraft&&S.pdraft.season)||(S.profile&&S.profile.season);return SEASONS[s]?s.toLowerCase().replace(/\s+/g,'-'):'none'};
 const NO_SEASON_SW=['#E4E1DB','#B5B0A7','#7A766F','#2F2E2B'];
-function swatchesHTML(){const s=S.profile&&S.profile.season,p=SEASONS[s];
-  return`<div class="swatches" role="img" aria-label="${p?esc(s)+' palette':'No color season set'}">${(p?p.core.map(c=>c.hex):NO_SEASON_SW).map(c=>`<i style="background:${c}"></i>`).join('')}</div>`}
+function swatchesHTML(fan){const s=(S.view==='profile'&&S.pdraft&&S.pdraft.season)||(S.profile&&S.profile.season),p=SEASONS[s];
+  return`<div class="swatches ${fan?'fan':''}" role="img" aria-label="${p?esc(s)+' palette':'No color season set'}">${(p?p.core.map(c=>c.hex):NO_SEASON_SW).map((c,n)=>`<i style="background:${c};--x:${-15*n}px;--d:${n*30}ms"></i>`).join('')}</div>`}
+const fanNow=()=>{if(fanned||!(S.profile&&S.profile.season))return false;fanned=true;return true};
+function seasonPicker(cur){return`<input type="hidden" name="season" value="${esc(cur)}"><div class="seasons" role="group" aria-label="Color season">${SEASON_NAMES.map(n=>`<button type="button" data-act="season-pick" data-v="${n}" aria-pressed="${n===cur}"><span class="swatches" aria-hidden="true">${SEASONS[n].core.slice(0,3).map(c=>`<i style="background:${c.hex}"></i>`).join('')}</span>${n}</button>`).join('')}</div>`}
 function chrome(){
   document.documentElement.dataset.season=seasonKey();
+  const tm=$('meta[name=theme-color]');if(tm)tm.content=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
   $('#tabs').innerHTML=!S.uid?'':tabList().map(v=>`<button data-act="go" data-v="${v}" ${S.view===v?'aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${ICON[v]}</svg>${LABEL[v]}</button>`).join('');
+  const tl=tabList(),ix=tl.indexOf(S.view),ln=$('#tabline');ln.classList.toggle('still',kbLast||ln.hidden);ln.style.width=100/tl.length+'%';ln.style.transform=`translateX(${Math.max(0,ix)*100}%)`;ln.hidden=!S.uid||ix<0||!(S.phase==='ready'||S.phase==='loading'||S.phase==='error');
   const n=[],signedIn=S.phase==='ready'||S.phase==='loading'||S.phase==='error';
   if(S.phase==='ready'&&S.ai.off)n.push('AI is unavailable for your account, so tagging, outfits and gaps are manual.');
   $('nav.tabs').hidden=!signedIn;$('#fb-open').hidden=S.phase!=='ready';
@@ -459,7 +592,7 @@ function walkHTML(){const p=S.profile;if(p&&p.walkDismissed)return'';
 /* ---------- Closet ---------- */
 function blankItem(){return{item_id:'',name:'',category:'top',subcategory:'',primary_color:'',secondary_color:'',palette_fit:'',material:'',formality:3,season:'all',brand:'',size:'',notes:'',price:'',photo:''}}
 function nextId(cat){const p=PRE[cat]||'ITM';let n=S.items.filter(i=>i.item_id.startsWith(p+'-')).length+1,id;do{id=p+'-'+String(n++).padStart(3,'0')}while(itemBy(id));return id}
-function thumb(i,cls='im'){return i.photo?`<img class="${cls}" src="${i.photo}" alt="" loading="lazy">`:`<span class="${cls}" style="background:${hueOf(i.primary_color)||'var(--wash)'}"></span>`}
+function thumb(i,cls='im'){return i.photo?`<img class="${cls}" src="${i.photo}" alt="" loading="lazy">`:`<span class="${cls}" style="background:${hueOf(i.primary_color)||'var(--line)'}"></span>`}
 const CAT_TABS=[['','All'],['top','Tops'],['bottom','Bottoms'],['one-piece','One-piece'],['outerwear','Outerwear'],['shoes','Shoes'],['accessory','Accessories']];
 function pieceHTML(i,st){const stale=isStale(i,st);
   return`<button class="piece" data-act="item-edit" data-id="${esc(i.item_id)}"><span class="fr">${i.photo?`<img src="${i.photo}" alt="" loading="lazy">`:`<span class="ph">${hueOf(i.primary_color)?`<i style="background:${hueOf(i.primary_color)}"></i>`:''}<em>No photo</em></span>`}${stale?'<span class="tag"><span class="tg"><i></i>Unworn 90d</span></span>':''}</span><span class="tx"><span class="nm">${esc(i.name||i.item_id)}</span><span class="mt">${wearLine(i,st)}</span>${i.palette_fit==='off-palette'?'<span class="mt off">Off-palette</span>':''}</span></button>`}
@@ -491,7 +624,7 @@ function itemForm(i,isNew,note){return`<form id="item-form" data-form="item" dat
   ${isNew?'':`<p class="hint">${(st=>wearLine(i,st)+(st?` · last worn ${day(st.last)}`:''))(wearStats().get(i.item_id))}</p>`}
   ${TA('Notes','notes',i.notes)}
   <div class="row"><button class="btn" type="submit">Save piece</button><button class="btn ghost" type="button" data-act="sheet-close">Cancel</button>${isNew?'':'<button class="btn danger" type="button" data-act="item-delete">Delete</button>'}</div></form>`}
-function openItem(item,isNew,note){E={orig:item,isNew,dirty:new Set(),photo:item.photo||''};openSheet(itemForm(item,isNew,note))}
+function openItem(item,isNew,note,morph){E={orig:item,isNew,dirty:new Set(),photo:item.photo||''};openSheet(itemForm(item,isNew,note),isNew||morph)}
 const setNote=t=>{const n=$('#item-note');if(n)n.textContent=t};
 const oneOf=(v,list,d)=>{v=String(v??'').toLowerCase().trim();return list.includes(v)?v:d};
 function applyTags(r){const f=$('#item-form');if(!f||!r||typeof r!=='object')return;
@@ -504,7 +637,7 @@ async function itemSave(){const f=$('#item-form');if(!f||!E)return;const d=formD
   if(!d.name.trim()){toast('Give the piece a name.');f.elements.name.focus();return}
   const it={...E.orig};CSV_COLS.forEach(k=>{if(k!=='item_id')it[k]=String(d[k]??'').trim()});it.formality=Number(d.formality)||3;it.price=Number(d.price)>0?Math.round(Number(d.price)*100)/100:'';it.photo=E.photo;
   if(E.isNew){it.item_id=nextId(it.category);it.created=Date.now();S.items.push(it)}else{const ix=S.items.findIndex(x=>x.item_id===it.item_id);if(ix>=0)S.items[ix]=it}
-  closeSheet();render();try{await save(P.item(it.item_id),it)}catch(e){}}
+  closeSheet(true);render();try{await save(P.item(it.item_id),it)}catch(e){}}
 
 /* CSV, in the wardrobe.csv column order */
 const csvCell=v=>{v=String(v??'');return/[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
@@ -542,14 +675,14 @@ async function importCSV(text){
 const AKEYS=['silhouettes','colors','fabrics','layering','footwear'];
 function cleanAnalysis(a){if(!a||typeof a!=='object')return null;const o={};AKEYS.forEach(k=>{o[k]=(Array.isArray(a[k])?a[k]:[]).map(x=>String(x).toLowerCase().trim().slice(0,40)).filter(Boolean).slice(0,5)});return AKEYS.some(k=>o[k].length)?o:null}
 function inspoView(){const read=S.inspo.filter(x=>x.analysis).length,todo=S.inspo.length-read,t=S.insights.taste;
-  let h=`<div class="head"><h1>Inspo</h1><p class="sub">${S.inspo.length?`${S.inspo.length} screenshot${S.inspo.length>1?'s':''} · ${read} read`:'No screenshots yet'}</p></div>
+  let h=`<div class="head split"><div class="hl"><h1>Inspo</h1><p class="sub">${S.inspo.length?`${S.inspo.length} screenshot${S.inspo.length>1?'s':''} · ${read} read`:'No screenshots yet'}</p></div>${swatchesHTML()}</div>
   <div class="row">${FILE('Add screenshots','inspo-add','accept="image/*" multiple','')}${todo&&S.ai.images?aiBtn(`Read ${todo} new with Claude`,'inspo-read','ghost'):''}${read>=2?aiBtn(t?'Rebuild taste profile':'Build taste profile','taste-build','ghost'):''}</div>`;
   if(!S.inspo.length)return h+`<section class="empty"><h2>Save looks, then bring them here</h2><p>Screenshot outfits you like on Pinterest or Instagram and add the screenshots. Nothing is fetched from the web. ${aiOK()?'Claude reads silhouettes, colors, fabrics, layering and footwear from each one, finds what keeps repeating, and can rebuild any look from pieces you own.':'Keep them here as a reference board.'}</p></section>`;
   if(t&&t.patterns&&t.patterns.length){const mx=Math.max(...t.patterns.map(p=>p.count),1);
-    h+=`<section class="card"><h3>Taste profile · from ${t.n} screenshot${t.n>1?'s':''}</h3><p class="why" style="font:italic 400 19px/1.35 var(--display)">${esc(t.summary)}</p><div>${t.patterns.map(p=>`<div class="pat"><div><b>${esc(p.pattern)}</b> <span class="chip">${esc(p.type)}</span> ${p.fits_palette?'<span class="pill good"><i></i>fits your palette</span>':'<span class="pill adapt"><i></i>adapt</span>'}</div><span class="cnt">×${p.count}</span><div class="meter"><i style="width:${Math.round(p.count/mx*100)}%"></i></div>${p.fits_palette||!p.adapt?'':`<p>${esc(p.adapt)}</p>`}</div>`).join('')}</div></section>`}
+    h+=`<section class="card"><h3>Taste profile · from ${t.n} screenshot${t.n>1?'s':''}</h3><p class="why">${esc(t.summary)}</p><div>${t.patterns.map(p=>`<div class="pat"><div><b>${esc(p.pattern)}</b> <span class="chip">${esc(p.type)}</span> ${p.fits_palette?'<span class="pill good"><i></i>fits your palette</span>':'<span class="pill adapt"><i></i>adapt</span>'}</div><span class="cnt">×${p.count}</span><div class="meter"><i style="width:${Math.round(p.count/mx*100)}%"></i></div>${p.fits_palette||!p.adapt?'':`<p>${esc(p.adapt)}</p>`}</div>`).join('')}</div></section>`}
   else if(read>=2)h+=`<p class="hint">${aiOK()?'Build the taste profile to see which patterns repeat and which fit your palette.':''}</p>`;
   else if(aiOK())h+=`<p class="hint">Read at least 2 screenshots to build a taste profile.</p>`;
-  return h+`<div class="grid">${S.inspo.slice().sort((a,b)=>b.created-a.created).map(x=>`<button class="item" data-act="inspo-open" data-id="${x.id}"><img class="im" src="${x.photo}" alt="Inspiration screenshot" loading="lazy"><span class="tx">${x.recreate?'<small>Recreated from your closet</small>':''}${x.analysis?`<span class="chips">${[...x.analysis.silhouettes.slice(0,2),...x.analysis.colors.slice(0,2)].map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</span>`:x.recreate?'':'<small>Tap to recreate from your closet</small>'}</span></button>`).join('')}</div>`}
+  return h+`<div class="grid">${S.inspo.slice().sort((a,b)=>b.created-a.created).map(x=>`<button class="piece" data-act="inspo-open" data-id="${x.id}"><span class="fr"><img src="${x.photo}" alt="Inspiration screenshot" loading="lazy"></span><span class="tx">${x.recreate?'<span class="mt">Recreated from your closet</span>':x.analysis?'':'<span class="mt">Tap to recreate from your closet</span>'}${x.analysis?`<span class="chips">${[...x.analysis.silhouettes.slice(0,2),...x.analysis.colors.slice(0,2)].map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</span>`:''}</span></button>`).join('')}</div>`}
 async function inspoAdd(files){let ok=0,bad=0;
   for(let i=0;i<files.length;i++){busy('Adding screenshots',`${i+1} of ${files.length}`);
     try{const x={id:'in'+rid(),photo:await shrink(files[i]),created:Date.now(),analysis:null};S.inspo.push(x);await save(P.inspo(x.id),x);ok++}catch(e){bad++}}
@@ -568,12 +701,15 @@ async function tasteBuild(){let r;try{r=await ask('Finding your patterns',tasteP
   S.insights={...S.insights,taste:{summary:String(r.summary||'').slice(0,300),patterns:pats,n,at:Date.now()}};render();try{await save(P.insights(),S.insights)}catch(e){}}
 
 /* ---------- Outfits ---------- */
-function layHTML(ids){const its=ids.map(id=>itemBy(id)||{item_id:id,name:'Removed piece',category:'accessory',missing:true}).sort((a,b)=>['outerwear','top','one-piece','bottom','shoes','accessory'].indexOf(a.category)-['outerwear','top','one-piece','bottom','shoes','accessory'].indexOf(b.category));
-  return`<div class="lay">${its.map(i=>`<div class="t ${i.category}">${i.photo?`<img src="${i.photo}" alt="${esc(i.name)}">`:`<div class="blk" style="background:${hueOf(i.primary_color)||'var(--card)'}"></div>`}<span>${esc(i.name)}</span></div>`).join('')}</div>`}
+const LAY=['outerwear','top','one-piece','bottom','shoes','accessory'];
+const tileHTML=i=>`${i.photo?`<img src="${i.photo}" alt="${esc(i.name)}">`:`<div class="blk" style="background:${hueOf(i.primary_color)||'var(--bg)'}"></div>`}<em>${esc(i.name)}</em>`;
+const swapOK=o=>!!(o.swap&&itemBy(o.swap.in)&&o.items.includes(o.swap.out));
+function layHTML(ids,play,swap){const its=ids.map(id=>itemBy(id)||{item_id:id,name:'Removed piece',category:'accessory',missing:true}).sort((a,b)=>LAY.indexOf(a.category)-LAY.indexOf(b.category));
+  return`<div class="lay ${play?'play':''}">${its.map((i,n)=>{const alt=swap&&i.item_id===swap.out?itemBy(swap.in):null;return`<div class="t ${i.category}" ${alt?'data-swap':''} style="--r:${n%2?.8:-1.1}deg;--d:${stag(n)}ms"><div class="a">${tileHTML(i)}</div>${alt?`<div class="b">${tileHTML(alt)}</div>`:''}</div>`}).join('')}</div>`}
 const nameOf=id=>{const i=itemBy(id);return i?i.name:'a removed piece'};
-function outfitBody(o){return`${layHTML(o.items)}<p class="why">${esc(o.reason)}</p>${o.swap?`<p class="kv"><b>Swap:</b> ${esc(nameOf(o.swap.out))} for ${esc(nameOf(o.swap.in))}${o.swap.why?` (${esc(o.swap.why)})`:''}</p>`:''}${o.gap?`<p class="kv"><b>Gap:</b> ${esc(o.gap)}</p>`:''}`}
+function outfitBody(o,play){return`${layHTML(o.items,play,swapOK(o)?o.swap:null)}<p class="why">${esc(o.reason)}</p>${o.swap?`<p class="kv"><b>Swap:</b> ${esc(nameOf(o.swap.out))} for ${esc(nameOf(o.swap.in))}${o.swap.why?` (${esc(o.swap.why)})`:''}${swapOK(o)?'<button type="button" class="lnk" data-act="swap-show" aria-pressed="false">Show swap</button>':''}</p>`:''}${o.gap?`<p class="kv"><b>Gap:</b> ${esc(o.gap)}</p>`:''}`}
 function outfitsView(){const f=S.oform,enough=S.items.length>=3;
-  let h=`<div class="head"><h1>Outfits</h1><p class="sub">${S.outfits.length?`${S.outfits.length} saved · ${S.outfits.filter(o=>o.status).length} logged`:'Built only from pieces you own'}</p></div>`+fitCard();
+  let h=`<div class="head split"><div class="hl"><h1>Outfits</h1><p class="sub">${S.outfits.length?`${S.outfits.length} saved · ${S.outfits.filter(o=>o.status).length} logged`:'Built only from pieces you own'}</p></div>${swatchesHTML()}</div>`+fitCard();
   if(!enough)return h+fitLog()+`<section class="empty"><h2>Add a few pieces first</h2><p>An outfit needs at least a top, a bottom and shoes from your closet. You have ${S.items.length} piece${S.items.length===1?'':'s'}.</p><button class="btn small" data-act="go" data-v="closet">Open closet</button></section>`;
   if(aiOK())h+=`<form class="card" data-form="outfit" data-submit="outfit-build" novalidate>
     <div class="grid2">${F('Occasion','occasion',f.occasion,'maxlength="80" placeholder="Dinner with friends"')}${F('Temperature (°F)','temp',f.temp,'type="number" inputmode="numeric" min="-40" max="130" placeholder="45" style="max-width:140px"')}</div>
@@ -582,7 +718,7 @@ function outfitsView(){const f=S.oform,enough=S.items.length>=3;
     <div class="row">${aiBtn('Build outfit','outfit-build')}</div></form>`;
   else h+=`<p class="hint">Outfit suggestions need Claude, which is unavailable in this view. Saved outfits below still work.</p>`;
   const s=S.suggestion;
-  if(s)h+=`<section class="card outfit"><h3>Suggested · ${esc(s.occasion)} · ${esc(s.temp)}°F</h3>${outfitBody(s)}<div class="row"><button class="btn" data-act="outfit-save">Save outfit</button>${aiBtn('Try another','outfit-again','ghost')}</div></section>`;
+  if(s)h+=`<section class="card outfit"><h3>Suggested · ${esc(s.occasion)} · ${esc(s.temp)}°F</h3>${outfitBody(s,fx('lay'))}<div class="row"><button class="btn" data-act="outfit-save">Save outfit</button>${aiBtn('Try another','outfit-again','ghost')}</div></section>`;
   if(!S.outfits.length&&!s)h+=`<section class="empty"><h2>No outfits yet</h2><p>Type an occasion and today's temperature, then tap Build outfit. Save the ones you like and log whether you wore them, so the next suggestions get closer.</p></section>`;
   h+=S.outfits.slice().sort((a,b)=>b.created-a.created).map(o=>`<section class="card outfit"><h3>${esc(o.occasion)}${o.temp===''||o.temp==null?'':` · ${esc(o.temp)}°F`} · ${day(o.created)}</h3>${outfitBody(o)}
     <div class="row" role="group" aria-label="Log this outfit">${[['wore','Wore it'],['swap','Wore with a swap'],['skipped','Skipped']].map(([k,l])=>`<button class="btn ghost small ${o.status===k?'on':''}" data-act="outfit-log" data-id="${o.id}" data-v="${k}" aria-pressed="${o.status===k}">${l}</button>`).join('')}<button class="btn ghost small" data-act="outfit-delete" data-id="${o.id}">Remove</button></div></section>`).join('');
@@ -603,7 +739,7 @@ async function outfitBuild(fresh){const f=S.oform;if(!f.occasion.trim()){toast('
     try{const r=await ask(a?'Checking the outfit again':'Building your outfit',a?`${p}\n\nYour previous reply was rejected because ${err}. Copy item_ids exactly from the closet list.`:p);err=checkOutfit(r,f.anchor);if(!err)out=r}
     catch(e){if(e.handled)return;if(e.code!=='invalid_json'&&e.code!=='empty_completion')break;err='it was not valid JSON'}}
   if(!out){toast("Claude couldn't build a valid outfit from your closet this time. Try again, or change the occasion.");return}
-  S.suggestion={items:out.items.map(String),reason:String(out.reason).slice(0,300),swap:out.swap?{out:String(out.swap.out),in:String(out.swap.in),why:String(out.swap.why||'').slice(0,120)}:null,gap:out.gap?String(out.gap).slice(0,200):null,occasion:f.occasion.trim(),temp,anchor:f.anchor||''};render()}
+  S.suggestion={items:out.items.map(String),reason:String(out.reason).slice(0,300),swap:out.swap?{out:String(out.swap.out),in:String(out.swap.in),why:String(out.swap.why||'').slice(0,120)}:null,gap:out.gap?String(out.gap).slice(0,200):null,occasion:f.occasion.trim(),temp,anchor:f.anchor||''};FX.add('lay');render()}
 
 /* ---------- Shop ---------- */
 /* Query: Claude's shopper-style phrase, else department + color + item. Price: a soft ceiling 25% over the target, no floor, so results stay plentiful. */
@@ -611,7 +747,7 @@ function shopURL(x,broad){const dep=(S.profile&&S.profile.department)||'',fallba
   const query=(broad?x.broad:x.search)||fallback,cap=!broad&&x.piece.price_high?Math.ceil(x.piece.price_high*1.25):0;
   return'https://www.google.com/search?tbm=shop&q='+encodeURIComponent(query)+(cap?'&tbs='+encodeURIComponent(`mr:1,price:1,ppr_max:${cap}`):'')}
 function shopView(){const g=S.insights.gaps;
-  let h=`<div class="head"><h1>Shop</h1><p class="sub">${g?`Top ${g.list.length} gaps · checked ${day(g.at)} against ${g.n} pieces`:'Buy only what fills a gap'}</p></div>`;
+  let h=`<div class="head split"><div class="hl"><h1>Shop</h1><p class="sub">${g?`Top ${g.list.length} gaps · checked ${day(g.at)} against ${g.n} pieces`:'Buy only what fills a gap'}</p></div>${swatchesHTML()}</div>`;
   if(S.items.length>=3&&aiOK())h+=buyCard()+'<h3>Gaps</h3>';
   if(S.items.length<5)return h+`<section class="empty"><h2>Gaps need a closet to measure</h2><p>Add at least 5 pieces so the analysis can count the outfits a new piece would unlock. You have ${S.items.length}.</p><button class="btn small" data-act="go" data-v="closet">Open closet</button></section>`;
   h+=`<div class="row">${aiBtn(g?'Check gaps again':'Find my 5 gaps','gaps-find')}</div>`;
@@ -660,11 +796,11 @@ function fitCard(){if(!S.items.length)return'';const done=S.wears.some(w=>w.date
   return`<section class="card"><h3>Today's fit${done?' · logged':''}</h3><p class="hint">${cam?'Snap a mirror photo. Claude rates it against your palette, spots which pieces you have on, and logs the wear after you confirm.':'Log what you wore to track wears and cost per wear.'}</p>
   <div class="row">${cam?FILE('Take mirror photo','fit-photo','accept="image/*" capture="environment"','')+FILE('Choose photo','fit-photo','accept="image/*"'):''}<button class="btn ghost" data-act="fit-manual">Log by hand</button></div></section>`}
 function fitSheet(){const d=FIT,rest=S.items.filter(i=>!d.worn.includes(i.item_id)).sort((a,b)=>a.name.localeCompare(b.name));
-  const cb=(i,on)=>`<label class="ck"><input type="checkbox" name="w" value="${esc(i.item_id)}" ${on?'checked':''}>${thumb(i,'mini')}<span>${esc(i.name)}</span></label>`;
-  openSheet(`<form data-form="fit" data-submit="fit-save" novalidate><h2>${d.rating?`${d.rating} out of 10`:'Log a wear'}</h2>
-  ${d.photo?`<img class="ph" src="${d.photo}" alt="Your fit photo">`:''}${d.note?`<p class="why" style="font:italic 400 19px/1.35 var(--display)">${esc(d.note)}</p>`:''}
+  const cb=(i,on,n)=>`<label class="ck" style="--d:${stag(n||0)}ms"><input type="checkbox" name="w" value="${esc(i.item_id)}" ${on?'checked':''}>${thumb(i,'mini')}<span>${esc(i.name)}</span></label>`;
+  openSheet(`<form class="${d.photo?'play':''}" data-form="fit" data-submit="fit-save" novalidate><h2>${d.photo?"Today's fit":'Log a wear'}</h2>
+  ${d.photo?`<div class="fitshot"><div class="shot"><img src="${d.photo}" alt="Your fit photo"><i class="scan"></i></div>${d.rating?hangTag({sm:true,label:'Fit rating',word:d.rating,l2:'out of 10'}):''}</div>`:''}${d.note?`<p class="why">${esc(d.note)}</p>`:''}
   ${F('Date worn','date',localDate(),`type="date" max="${localDate()}"`)}
-  ${d.worn.length?`<div><h3>Pieces Claude spotted · untick any it got wrong</h3><div class="cks">${d.worn.map(id=>cb(itemBy(id),true)).join('')}</div></div>${rest.length?`<details><summary>Add a piece it missed</summary><div class="cks scroll">${rest.map(i=>cb(i,false)).join('')}</div></details>`:''}`
+  ${d.worn.length?`<div><h3>Pieces Claude spotted · untick any it got wrong</h3><div class="cks spot">${d.worn.map((id,n)=>cb(itemBy(id),true,n)).join('')}</div></div>${rest.length?`<details><summary>Add a piece it missed</summary><div class="cks scroll">${rest.map(i=>cb(i,false)).join('')}</div></details>`:''}`
     :`<div><h3>${d.photo?"Claude didn't recognize closet pieces · tick what you wore":'Tick what you wore'}</h3><div class="cks scroll">${rest.map(i=>cb(i,false)).join('')}</div></div>`}
   ${d.fresh.length?`<div><h3>Not in your closet yet · ticked ones get added</h3><div class="cks">${d.fresh.map((n,ix)=>`<label class="ck"><input type="checkbox" name="n" value="${ix}" checked><span>${esc(n.name)} · ${esc(n.category)}${n.primary_color?` · ${esc(n.primary_color)}`:''}</span></label>`).join('')}</div></div>`:''}
   <div class="row"><button class="btn" type="submit">Save to wear log</button><button class="btn ghost" type="button" data-act="sheet-close">Cancel</button></div></form>`)}
@@ -674,10 +810,10 @@ async function fitPhoto(files){let photo;try{photo=await shrink(files[0])}catch(
 async function fitSave(){const f=$('form[data-form=fit]');if(!f||!FIT)return;const fd=new FormData(f),ids=validIds(fd.getAll('w')),date=/^\d{4}-\d\d-\d\d$/.test(fd.get('date')||'')?fd.get('date'):localDate(),added=[];
   for(const ix of fd.getAll('n')){const n=FIT.fresh[Number(ix)];if(!n)continue;const it={...blankItem(),...n,item_id:nextId(n.category),created:Date.now(),notes:'Added from a fit photo'};S.items.push(it);added.push(it);ids.push(it.item_id)}
   if(!ids.length){toast('Tick at least one piece you wore.');return}
-  const w={id:'w'+rid(),date,at:Date.parse(date+'T12:00:00')||Date.now(),items:ids,rating:FIT.rating,note:FIT.note,photo:FIT.photo||''};S.wears.push(w);FIT=null;closeSheet();render();
+  const w={id:'w'+rid(),date,at:Date.parse(date+'T12:00:00')||Date.now(),items:ids,rating:FIT.rating,note:FIT.note,photo:FIT.photo||''};const was=wearStats();S.wears.push(w);const now=wearStats();ROLL={id:w.id,rows:ids.map(id=>{const i=itemBy(id);return i?{name:i.name,from:cpw(i,was.get(id))||Number(i.price)||0,to:cpw(i,now.get(id))}:null}).filter(r=>r&&r.to)};FIT=null;closeSheet();FX.add('roll');render();
   try{for(const it of added)await save(P.item(it.item_id),it);await save(P.wear(w.id),w);toast(`Logged ${ids.length} piece${ids.length>1?'s':''}${added.length?`, ${added.length} added to your closet`:''}.`)}catch(e){}}
 function fitLog(){if(!S.wears.length)return'';const list=S.wears.slice().sort((a,b)=>b.at-a.at),rated=list.filter(w=>w.rating),avg=rated.length?(rated.reduce((t,w)=>t+w.rating,0)/rated.length).toFixed(1):'';
-  return`<section class="card"><h3>Wear log · ${list.length} day${list.length>1?'s':''}${avg?` · average ${avg}/10`:''}</h3><div>${list.slice(0,14).map(w=>`<div class="fbrow"><div class="row" style="flex-wrap:nowrap;align-items:flex-start">${w.photo?`<img class="mini big" src="${w.photo}" alt="Fit photo" loading="lazy">`:''}<div class="stack" style="gap:6px;min-width:0;flex:1"><div class="meta"><b>${day(w.at)}</b>${w.rating?`<span>${w.rating}/10</span>`:''}</div>${w.note?`<p class="hint">${esc(w.note)}</p>`:''}${chipsOf(w.items)}<div><button class="btn ghost small" data-act="wear-delete" data-id="${w.id}">Remove</button></div></div></div></div>`).join('')}</div></section>`}
+  return`<section class="card"><h3>Wear log · ${list.length} day${list.length>1?'s':''}${avg?` · average ${avg}/10`:''}</h3><div>${list.slice(0,14).map(w=>`<div class="fbrow"><div class="row" style="flex-wrap:nowrap;align-items:flex-start;gap:16px">${w.photo?`<div class="logph"><img class="mini big" src="${w.photo}" alt="Fit photo" loading="lazy">${w.rating?`<span class="tag"><span class="tg"><i></i>${w.rating}/10</span></span>`:''}</div>`:''}<div class="stack" style="gap:6px;min-width:0;flex:1"><div class="meta"><b>${day(w.at)}</b>${w.rating&&!w.photo?`<span>${w.rating}/10</span>`:''}</div>${w.note?`<p class="hint">${esc(w.note)}</p>`:''}${chipsOf(w.items)}${ROLL&&ROLL.id===w.id&&ROLL.rows.length?`<div class="rolls">${ROLL.rows.map(r=>`<span>${esc(r.name)} <b data-roll="${r.from}|${r.to}">${money(r.to)}</b>/wear</span>`).join('')}</div>`:''}<div><button class="btn ghost small" data-act="wear-delete" data-id="${w.id}">Remove</button></div></div></div></div>`).join('')}</div></section>`}
 
 /* ---------- Inspiration to closet ---------- */
 function recreatePrompt(){return `Recreate the outfit in this inspiration image using only pieces from the user's closet. ${JSON_ONLY}
@@ -700,16 +836,20 @@ async function inspoRecreate(id){const x=S.inspo.find(i=>i.id===id);if(!x)return
   x.recreate={items:out.items.map(String),match:oneOf(out.match,['close','partial','loose'],'partial'),reason:String(out.reason).slice(0,300),missing:m,at:Date.now()};render();inspoSheet(x);
   try{await save(P.inspo(x.id),x)}catch(e){}}
 const missURL=m=>shopURL({search:m.search,broad:'',piece:{color:m.color,item:m.item,price_high:0}});
-function inspoSheet(x){const r=x.recreate;openSheet(`<h2>Saved look</h2><img class="ph" style="width:200px" src="${x.photo}" alt="Inspiration screenshot">
-  ${r?`<div class="stack"><h3>From your closet · ${r.match} match</h3>${layHTML(r.items)}<p class="why" style="font:italic 400 19px/1.35 var(--display)">${esc(r.reason)}</p>
-    ${r.missing?`<p class="kv"><b>The one missing piece:</b> ${esc([r.missing.color,r.missing.cut,r.missing.item].filter(Boolean).join(' '))}${r.missing.fabric?` in ${esc(r.missing.fabric)}`:''}${r.missing.why?` (${esc(r.missing.why)})`:''}</p>`:'<p class="kv"><b>Nothing missing.</b> Your closet covers this look.</p>'}
-    <div class="row"><button class="btn small" data-act="recreate-save" data-id="${x.id}">Save as outfit</button>${r.missing?`<a class="btn ghost small" href="${esc(missURL(r.missing))}" target="_blank" rel="noopener noreferrer">Search the missing piece</a>`:''}</div></div>`:''}
+function inspoSheet(x){const r=x.recreate,rows=r?r.items.map(itemBy).filter(Boolean):[],lab=r&&r.match==='close'?['Match','match']:['Close','close'],m=r&&r.missing;
+  const hit=m&&S.insights.gaps&&S.insights.gaps.list.find(g=>{const a=g.piece.item.toLowerCase(),b=m.item.toLowerCase();return a.includes(b)||b.includes(a)});
+  const AR='<svg class="ar" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  openSheet(`<h2>Saved look</h2><div class="look"><img src="${x.photo}" alt="Inspiration screenshot"></div>
+  ${r?`<div class="stack" style="gap:4px"><h2>Your closest version</h2><p class="sub">${rows.length} piece${rows.length===1?'':'s'} from your closet${m?' · 1 to buy':''} · ${r.match} match</p></div>
+    <div class="rows">${rows.map((i,n)=>`<div class="mrow slide" style="--i:${n}"><span class="slot">${esc(i.category)}</span>${AR}${thumb(i,'mini')}<div class="bd"><b>${esc(i.name)}</b><small>${esc([i.subcategory,i.primary_color].filter(Boolean).join(' · ')||i.item_id)}</small></div><span class="lab ${lab[1]}">${lab[0]}</span></div>`).join('')}${m?`<div class="mrow slide" style="--i:${rows.length}"><span class="slot">To buy</span>${AR}<span class="ghostbox ghost"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M30 16 L41 10 Q50 19 59 10 L70 16 L89 33 L79 45 L70 39 L70 90 L30 90 L30 39 L21 45 L11 33 Z"/></svg></span><div class="bd"><b>${esc([m.color,m.cut,m.item].filter(Boolean).join(' '))}</b><small>Not in your closet${m.why?` · ${esc(m.why)}`:''}</small></div><span class="lab missing">Missing</span></div>`:''}</div>
+    <p class="why">${esc(r.reason)}</p>
+    ${m?`<div class="row"><button class="btn ghost" data-act="look-gap">See it in Shop${hit?` · unlocks about ${hit.unlocks} outfit${hit.unlocks===1?'':'s'}`:''}</button><a class="lnk" style="display:inline-flex;align-items:center" href="${esc(missURL(m))}" target="_blank" rel="noopener noreferrer">Search the missing piece</a></div>`:'<p class="kv"><b>Nothing missing.</b> Your closet covers this look.</p>'}`:''}
   ${x.analysis?AKEYS.map(k=>x.analysis[k].length?`<div><h3>${k}</h3><div class="chips" style="margin-top:6px">${x.analysis[k].map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</div></div>`:'').join(''):''}
-  <div class="row">${S.items.length>=3&&S.ai.images?aiBtn(r?'Recreate again':'Recreate from my closet','inspo-recreate','small').replace('data-act=',`data-id="${x.id}" data-act=`):''}<button class="btn ghost small" data-act="sheet-close">Close</button><button class="btn danger small" data-act="inspo-delete" data-id="${x.id}">Delete</button></div>
+  <div class="row">${r?`<button class="btn" data-act="recreate-save" data-id="${x.id}">Save as outfit</button>`:''}${S.items.length>=3&&S.ai.images?aiBtn(r?'Recreate again':'Recreate from my closet','inspo-recreate',r?'ghost':'').replace('data-act=',`data-id="${x.id}" data-act=`):''}<button class="btn ghost" data-act="sheet-close">Close</button><button class="btn danger" data-act="inspo-delete" data-id="${x.id}">Delete</button></div>
   ${S.items.length<3?'<p class="hint">Add at least 3 pieces to your closet to recreate this look from what you own.</p>':''}`)}
 
 /* ---------- Buy-check ---------- */
-const VERDICT={buy:['Buy it','good'],maybe:['Maybe','adapt'],skip:["Don't buy this",'off']};
+const VERDICT={buy:['Buy it','good','Buy'],maybe:['Maybe','adapt','Maybe'],skip:["Don't buy this",'off','Skip']};
 const b64Blob=(b64,type)=>{const bin=atob(b64),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new Blob([a],{type:type||'image/jpeg'})};
 async function fetchProduct(url){try{const ses=(await sb.auth.getSession()).data.session;if(!ses)return null;
   const r=await withTimeout(fetch('/api/product',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+ses.access_token},body:JSON.stringify({url})}),20000);return r.ok?await r.json():null}catch(e){return null}}
@@ -732,12 +872,11 @@ function buyCard(){const b=S.buy,r=S.buyResult,past=(S.insights.checks||[]);
   let h=`<form class="card" data-form="buy" data-submit="buy-check" novalidate><h3>Buy-check</h3><p class="hint">Paste a product link, add a screenshot, or both. The verdict weighs your palette, what you already own and how many new outfits it unlocks.</p>
     ${F('Product link','url',b.url,'type="url" inputmode="url" autocomplete="off" placeholder="https://"')}
     <div class="row">${FILE(b.photo?'Replace screenshot':'Add screenshot','buy-photo','accept="image/*"')}${b.photo?`<img class="mini" src="${b.photo}" alt="Product screenshot">`:''}${aiBtn('Check before I buy','buy-check')}</div></form>`;
-  if(r){const[label,cls]=VERDICT[r.verdict];h+=`<section class="card"><h3>Verdict · ${esc(r.item.name||'this piece')}${r.price?` · $${esc(r.price)}`:''}</h3>
-    <div class="row" style="flex-wrap:nowrap;align-items:flex-start">${r.photo?`<img class="mini big" src="${r.photo}" alt="The product">`:''}<div class="stack" style="gap:8px;min-width:0"><p class="stamp ${cls}">${label}</p><p>${esc(r.headline)}</p></div></div>
-    <div class="kv"><b>Palette:</b> ${fitPill(r.item.palette_fit)} ${esc(r.palette_note)}</div>
-    <div class="kv stack" style="gap:6px"><span><b>Duplicates:</b> ${r.duplicates.length?esc(r.duplicate_note):'nothing you own'}</span>${r.duplicates.length?chipsOf(r.duplicates):''}</div>
-    <div class="kv stack" style="gap:6px"><span><b>Unlocks about ${r.unlocks} new outfit${r.unlocks===1?'':'s'}</b>${r.pairs_with.length?' with:':''}</span>${r.pairs_with.length?chipsOf(r.pairs_with):''}</div>
-    ${r.budget_note?`<p class="kv"><b>Budget:</b> ${esc(r.budget_note)}</p>`:''}
+  if(r){const[label,,word]=VERDICT[r.verdict],n=r.unlocks,dup=r.duplicates.length;
+    const why=[esc(r.headline),`<span>${fitPill(r.item.palette_fit)} ${esc(r.palette_note)}</span>`,dup?`<span>${esc(r.duplicate_note||'It duplicates pieces you own.')}</span>${chipsOf(r.duplicates)}`:'It duplicates nothing you own.',`<span>Unlocks about ${n} new outfit${n===1?'':'s'}${r.pairs_with.length?' with:':'.'}</span>${r.pairs_with.length?chipsOf(r.pairs_with):''}`,esc(r.budget_note)].filter(Boolean);
+    h+=`<section class="vd ${fx('buy')?'play':''}" aria-label="Verdict: ${esc(label)}"><div class="verdict">${r.photo?`<div class="pic"><img src="${r.photo}" alt="The product"></div>`:''}<div class="cap"><b>${esc(r.item.name||'This piece')}</b><small>${esc([r.price?'$'+r.price:'',r.item.material].filter(Boolean).join(' · '))}</small></div>
+      ${hangTag({label:'Verdict',word,l1:`Unlocks <span data-count="${n}">${n}</span> outfit${n===1?'':'s'}`,l2:dup?`Dupes ${dup} piece${dup===1?'':'s'}`:'No dupes'})}</div>
+    <h2 class="whyh">Why</h2><div class="rows">${why.map((t,i)=>`<div class="rw rise" style="--i:${i}"><span class="n">${i+1}</span><div class="bd">${t}</div></div>`).join('')}</div>
     <div class="row"><button class="btn ghost small" data-act="buy-add">I bought it · add to closet</button><button class="btn ghost small" data-act="buy-clear">Clear</button></div></section>`}
   else if(past.length)h+=`<p class="hint">Recent checks: ${past.slice(0,5).map(c=>`${esc(c.name)} (${VERDICT[c.verdict]?VERDICT[c.verdict][0].toLowerCase():c.verdict})`).join(' · ')}</p>`;
   return h}
@@ -754,15 +893,15 @@ async function buyCheck(){const b=S.buy,url=b.url.trim();
   if(!r||typeof r!=='object'||!VERDICT[r.verdict]){toast("The verdict didn't come back cleanly. Try again.");return}
   const price=Number(r.price)>0?Math.round(Number(r.price)*100)/100:(page&&Number(page.price)>0?Number(page.price):0);
   S.buyResult={item:normTag(r.item),price,verdict:r.verdict,headline:String(r.headline||'').slice(0,240),palette_note:String(r.palette_note||'').slice(0,160),duplicates:validIds(r.duplicates).slice(0,4),duplicate_note:String(r.duplicate_note||'').slice(0,160),unlocks:Math.max(0,Math.round(Number(r.unlocks))||0),pairs_with:validIds(r.pairs_with).slice(0,6),budget_note:String(r.budget_note||'').slice(0,160),photo:photo||'',url};
-  S.buy={url:'',photo:''};S.insights={...S.insights,checks:[{name:S.buyResult.item.name||'Unnamed piece',verdict:r.verdict,at:Date.now()},...(S.insights.checks||[])].slice(0,10)};render();
+  S.buy={url:'',photo:''};S.insights={...S.insights,checks:[{name:S.buyResult.item.name||'Unnamed piece',verdict:r.verdict,at:Date.now()},...(S.insights.checks||[])].slice(0,10)};FX.add('buy');render();
   try{await save(P.insights(),S.insights)}catch(e){}}
 
 /* ---------- Profile ---------- */
 const blankProfile=()=>({season:'',metals:'',department:'',style:'',height:'',build:'',measurements:'',sizes:'',fit_problems:'',budgets:{},hard_nos:''});
 function profileView(){if(!S.pdraft)S.pdraft={...blankProfile(),...(S.profile||{}),budgets:{...((S.profile||{}).budgets||{})}};const d=S.pdraft,e=S.selfie;
-  return`<div class="head"><h1>Profile</h1><p class="sub">${S.profile?'Private to you. Edit any time.':'Start here. Everything else is judged against this.'}</p></div>
+  return`<div class="head split"><div class="hl"><h1>Profile</h1><p class="sub">${S.profile?'Private to you. Edit any time.':'Start here. Everything else is judged against this.'}</p></div>${swatchesHTML(fanNow())}</div>
   <form class="stack" data-form="profile" data-submit="profile-save" novalidate>
-    <section class="card"><h3>Color</h3>${SEL('Color season','season',d.season,[['','Choose a season'],...SEASON_NAMES])}
+    <section class="card"><h3>Color</h3><div class="f"><span id="season-l">Color season</span></div>${seasonPicker(d.season)}
       ${d.season?palHTML(d.season):'<p class="hint">Pick the season from your color analysis to see its palette. Not sure? Choose the closest and change it later.</p>'}
       ${aiOK()&&S.ai.images?`<div class="row">${FILE('Estimate from a daylight selfie','selfie','accept="image/*"','ghost small')}</div><p class="hint">Estimate, not a substitute for a draped analysis. The selfie goes to Claude once and is not saved.</p>`:''}
       ${e?`<div class="card"><h3>Estimate, not a substitute for a draped analysis</h3><p><b>${esc(e.season)}</b> · ${esc(e.confidence)} confidence${e.runner_up&&e.runner_up!==e.season?` · runner-up ${esc(e.runner_up)}`:''}</p><p class="hint">${esc(e.why)}</p><div class="row"><button type="button" class="btn small" data-act="selfie-use">Use ${esc(e.season)}</button></div></div>`:''}
@@ -808,7 +947,7 @@ async function loadFeedback(){S.fb={list:null,err:'',loading:true};render();
     S.fb={list:rows.map(r=>({who:r.email,text:r.body,rating:r.rating,view:r.view,at:Date.parse(r.created_at)})),err:''}}
   catch(e){S.fb={list:null,err:e&&e.code==='timeout'?'Feedback is taking longer than 10 seconds to load.':"Feedback didn't load."}}
   if(S.view==='feedback')render()}
-function feedbackView(){const fb=S.fb;let h=`<div class="head"><h1>Feedback</h1><p class="sub">${fb.list?`${fb.list.length} entr${fb.list.length===1?'y':'ies'}, newest first · only you see this tab`:'Only you see this tab'}</p></div>`;
+function feedbackView(){const fb=S.fb;let h=`<div class="head split"><div class="hl"><h1>Feedback</h1><p class="sub">${fb.list?`${fb.list.length} entr${fb.list.length===1?'y':'ies'}, newest first · only you see this tab`:'Only you see this tab'}</p></div>${swatchesHTML()}</div>`;
   if(fb.err)return h+`<section class="empty"><h2>Not loaded</h2><p>${esc(fb.err)}</p><button class="btn small" data-act="fb-reload">Retry</button></section>`;
   if(!fb.list)return h+`<p class="hint">Loading feedback…</p>`;
   if(!fb.list.length)return h+`<section class="empty"><h2>No feedback yet</h2><p>Share the link with friends. Every screen has a Send feedback button, and what they write lands here.</p><button class="btn small" data-act="fb-reload">Refresh</button></section>`;
@@ -841,20 +980,23 @@ function render(){chrome();const v=$('#view');
   if(S.phase==='setup'){v.innerHTML=`<section class="empty"><h2>Almost there</h2><p>${esc(S.loadErr)}</p></section>`;return}
   if(S.phase==='auth'){v.innerHTML=authView();return}
   if(S.phase==='error'){v.innerHTML=`<section class="empty"><h2>Not loaded yet</h2><p>${esc(S.loadErr)}</p><button class="btn" data-act="load-retry">Retry</button></section>`;return}
-  v.innerHTML=walkHTML()+VIEWS[S.view]()}
+  v.innerHTML=walkHTML()+VIEWS[S.view]();
+  if(fx('buy'))v.querySelectorAll('[data-count]').forEach(el=>tween(el,0,Number(el.dataset.count),Math.round,900,600));
+  if(fx('roll'))v.querySelectorAll('[data-roll]').forEach(el=>{const[a,b]=el.dataset.roll.split('|').map(Number);tween(el,a,b,money,350,700)});
+  FX.clear()}
 const okView=v=>!!VIEWS[v]&&(v!=='feedback'||S.isOwner);
 function enter(){if(S.view==='feedback'&&!S.fb.list&&!S.fb.loading&&S.phase==='ready')loadFeedback()}
 function route(){const h=(location.hash||'').slice(1);S.view=okView(h)?h:(S.phase==='ready'&&!S.profile?'profile':okView(S.view)?S.view:'closet');enter()}
-function go(v){S.view=okView(v)?v:'closet';try{if(location.hash!=='#'+S.view)location.hash=S.view}catch(e){}enter();render();window.scrollTo(0,0)}
+function go(v){ROLL=null;S.view=okView(v)?v:'closet';try{if(location.hash!=='#'+S.view)location.hash=S.view}catch(e){}enter();render();window.scrollTo(0,0)}
 window.addEventListener('hashchange',()=>{route();render()});
 
 const ACT={
   go:t=>go(t.dataset.v),'auth-in':()=>authGo(false),'auth-up':()=>authGo(true),'sign-out':async()=>{try{await sb.auth.signOut()}catch(e){}},
-  'load-retry':()=>loadAll(),'sheet-close':closeSheet,'ai-stop':()=>ctl&&ctl.abort(),
+  'load-retry':()=>loadAll(),'sheet-close':()=>dismissSheet(),'ai-stop':()=>ctl&&ctl.abort(),
   'walk-dismiss':async()=>{S.profile={...S.profile,walkDismissed:true};render();try{await save(P.profile(),S.profile)}catch(e){}},
   'copy-src':async()=>{const el=$('#copy-src');try{await navigator.clipboard.writeText(el.value);toast('Copied.')}catch(e){el.focus();el.select();toast('Select the text and copy it.')}},
   'item-new':()=>openItem(blankItem(),true,'Fill in the details, then save.'),
-  'item-edit':t=>{const i=itemBy(t.dataset.id);if(i)openItem(i,false,'')},
+  'item-edit':t=>{const i=itemBy(t.dataset.id);if(i)morphOpen(t,i)},
   'item-retag':()=>tagOpenItem(),'item-save':itemSave,
   'item-delete':t=>{if(t.dataset.sure){const id=E.orig.item_id;S.items=S.items.filter(x=>x.item_id!==id);closeSheet();render();remove(P.item(id)).catch(()=>toast("That didn't delete. Check your connection and try again."))}else{t.dataset.sure='1';t.textContent='Tap again to delete'}},
   'filter-cat':t=>{const v=t.dataset.v;S.filters.category=v;render();const b=$(`.ftabs [data-v="${v}"]`);if(b)b.focus({preventScroll:true})},
@@ -867,6 +1009,10 @@ const ACT={
   'inspo-recreate':t=>inspoRecreate(t.dataset.id),
   'recreate-save':async t=>{const x=S.inspo.find(i=>i.id===t.dataset.id);if(!x||!x.recreate)return;const o={id:'o'+rid(),items:x.recreate.items,reason:x.recreate.reason,swap:null,gap:x.recreate.missing?[x.recreate.missing.color,x.recreate.missing.item].filter(Boolean).join(' '):null,occasion:'From a saved look',temp:'',anchor:'',created:Date.now(),status:null};S.outfits.push(o);closeSheet();go('outfits');try{await save(P.outfit(o.id),o);toast('Saved to Outfits.')}catch(e){}},
   'inspo-delete':t=>{if(t.dataset.sure){const id=t.dataset.id;S.inspo=S.inspo.filter(x=>x.id!==id);closeSheet();render();remove(P.inspo(id)).catch(()=>{})}else{t.dataset.sure='1';t.textContent='Tap again to delete'}},
+  'swap-show':t=>{const tile=t.closest('.card').querySelector('.t[data-swap]');if(!tile)return;const on=tile.classList.toggle('sw');t.setAttribute('aria-pressed',on);t.textContent=on?'Show original':'Show swap'},
+  'look-gap':()=>{closeSheet();go('shop')},
+  'season-pick':(t,e)=>{const f=$('form[data-form=profile]');if(f)syncProfile(f);const v=t.dataset.v;if(S.pdraft.season===v)return;const r=t.getBoundingClientRect(),pt=e&&e.detail>0;
+    redye(pt?e.clientX:r.left+r.width/2,pt?e.clientY:r.top+r.height/2,()=>{S.pdraft.season=v;render();const b=$(`.seasons [data-v="${v}"]`);if(b)b.focus({preventScroll:true})})},
   occasion:t=>{S.oform.occasion=t.dataset.v;render()},
   'outfit-build':()=>outfitBuild(false),'outfit-again':()=>outfitBuild(true),
   'outfit-save':async()=>{const s=S.suggestion;if(!s)return;const o={id:'o'+rid(),...s,created:Date.now(),status:null};S.outfits.push(o);S.suggestion=null;render();try{await save(P.outfit(o.id),o);toast('Saved. Log it after you wear it.')}catch(e){}},
@@ -877,7 +1023,7 @@ const ACT={
   'buy-check':buyCheck,'buy-clear':()=>{S.buyResult=null;render()},
   'buy-add':()=>{const r=S.buyResult;if(r)openItem({...blankItem(),...r.item,price:r.price||'',photo:r.photo||''},true,'From your buy-check. Adjust anything, then save.')},
   'gaps-find':gapsFind,'profile-save':profileSave,
-  'selfie-use':()=>{const f=$('form[data-form=profile]');if(f)syncProfile(f);S.pdraft.season=S.selfie.season;S.selfie=null;render();toast('Season set. Save the profile to keep it.')},
+  'selfie-use':t=>{const f=$('form[data-form=profile]');if(f)syncProfile(f);const r=t.getBoundingClientRect();redye(r.left+r.width/2,r.top+r.height/2,()=>{S.pdraft.season=S.selfie.season;S.selfie=null;render()});toast('Season set. Save the profile to keep it.')},
   'data-export':exportData,
   'data-delete':()=>openSheet(`<h2>Delete all your data?</h2><p class="hint">This removes your profile, ${S.items.length} piece${S.items.length===1?'':'s'}, ${S.inspo.length} screenshot${S.inspo.length===1?'':'s'} ${S.outfits.length} outfit${S.outfits.length===1?'':'s'} and ${S.wears.length} wear log entr${S.wears.length===1?'y':'ies'}. It can't be undone. Feedback you already sent stays with the owner.</p><div class="row"><button class="btn danger" data-act="data-delete-yes">Delete everything</button><button class="btn ghost" data-act="sheet-close">Keep my data</button></div>`),
   'data-delete-yes':deleteData,
@@ -892,7 +1038,7 @@ const FILES={
   'buy-photo':async files=>{try{S.buy.photo=await shrink(files[0])}catch(e){toast("That image couldn't be opened. Try a JPEG or PNG.");return}render()},
   'csv-file':async files=>{try{importCSV(await files[0].text())}catch(e){toast("That file couldn't be read.")}},
 };
-document.addEventListener('click',e=>{if(e.target.id==='scrim'){closeSheet();return}const t=e.target.closest('[data-act]');if(!t||t.disabled)return;const fn=ACT[t.dataset.act];if(fn&&!(t.type==='submit'&&t.form)){e.preventDefault();fn(t)}});
+document.addEventListener('click',e=>{if(e.target.id==='shade'){dismissSheet();return}const t=e.target.closest('[data-act]');if(!t||t.disabled)return;const fn=ACT[t.dataset.act];if(fn&&!(t.type==='submit'&&t.form)){e.preventDefault();fn(t,e)}});
 document.addEventListener('submit',e=>{e.preventDefault();const fn=ACT[e.target.dataset.submit];if(fn)fn(e.target)});
 document.addEventListener('change',e=>{const t=e.target;
   if(t.matches('input[type=file][data-file]')){const files=[...t.files],k=t.dataset.file;t.value='';if(files.length&&FILES[k])FILES[k](files);return}
@@ -901,7 +1047,16 @@ document.addEventListener('change',e=>{const t=e.target;
 document.addEventListener('input',e=>{const t=e.target,f=t.form;if(!f||!t.name)return;
   if(f.dataset.form==='profile')syncProfile(f);else if(f.dataset.form==='outfit')S.oform[t.name]=t.value;else if(f.dataset.form==='buy')S.buy[t.name]=t.value;else if(f.dataset.form==='item'&&E)E.dirty.add(t.name)});
 document.addEventListener('toggle',e=>{if(e.target.id==='refine')S.refine=e.target.open},true);
+document.addEventListener('keydown',()=>{kbLast=true},true);
+document.addEventListener('pointerdown',()=>{kbLast=false},true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#scrim').classList.contains('open'))closeSheet()});
+/* Bottom sheet: the grab strip tracks the finger 1:1 (no easing while the pointer is down); on release it dismisses on distance or a flick, else returns. */
+(()=>{let d=null;const sh=$('#sheet'),shade=$('#shade');
+  document.addEventListener('pointerdown',e=>{const g=e.target.closest&&e.target.closest('.grab');if(!g||d)return;d={id:e.pointerId,y0:e.clientY,y:0,h:sh.offsetHeight,pts:[[e.timeStamp,e.clientY]]};try{g.setPointerCapture(e.pointerId)}catch(x){}sh.style.transition='none';shade.style.transition='none'});
+  document.addEventListener('pointermove',e=>{if(!d||e.pointerId!==d.id)return;let y=e.clientY-d.y0;if(y<0)y*=.2;d.y=y;d.pts.push([e.timeStamp,e.clientY]);if(d.pts.length>5)d.pts.shift();sh.style.transform=`translateY(${y}px)`;shade.style.opacity=String(Math.max(0,1-Math.max(0,y)/d.h))});
+  const end=e=>{if(!d||e.pointerId!==d.id)return;const a=d.pts[0],b=d.pts[d.pts.length-1],v=b[0]>a[0]?(b[1]-a[1])/(b[0]-a[0]):0,out=e.type==='pointerup'&&d.y>0&&(d.y>d.h*.4||v>.5);d=null;sh.style.transition='';shade.style.transition='';
+    if(out)dismissSheet(true);else{sh.style.transform='';shade.style.opacity=''}};
+  document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end)})();
 
 /* ---------- boot ---------- */
 async function boot(){
